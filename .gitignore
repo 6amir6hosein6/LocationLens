@@ -3,6 +3,9 @@
 .env.local
 .env.*.local
 
+# Root-level Docker Compose .env
+/*.env
+
 # Python
 __pycache__/
 *.py[cod]

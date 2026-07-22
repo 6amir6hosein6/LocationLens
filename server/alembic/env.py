@@ -1,4 +1,5 @@
 import asyncio
+import os
 from logging.config import fileConfig
 from sqlalchemy import pool
 from sqlalchemy.ext.asyncio import async_engine_from_config
@@ -15,7 +16,7 @@ target_metadata = Base.metadata
 
 
 def run_migrations_offline() -> None:
-    url = config.get_main_option("sqlalchemy.url")
+    url = os.environ.get("DATABASE_URL", config.get_main_option("sqlalchemy.url"))
     context.configure(
         url=url,
         target_metadata=target_metadata,
@@ -34,7 +35,8 @@ def do_run_migrations(connection):
 
 async def run_async_migrations() -> None:
     from sqlalchemy.ext.asyncio import create_async_engine
-    connectable = create_async_engine(config.get_main_option("sqlalchemy.url"))
+    url = os.environ.get("DATABASE_URL", config.get_main_option("sqlalchemy.url"))
+    connectable = create_async_engine(url)
 
     async with connectable.connect() as connection:
         await connection.run_sync(do_run_migrations)

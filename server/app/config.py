@@ -2,6 +2,19 @@ from pydantic_settings import BaseSettings
 import os
 
 
+def _find_env_file() -> str | None:
+    """Look for .env in the application folder or one level up (Docker Compose root)."""
+    # 1) local folder (server/)
+    local_env = os.path.join(os.path.dirname(__file__), ".env")
+    if os.path.isfile(local_env):
+        return local_env
+    # 2) project root (one level up from server/app/ → LocationLens/)
+    root_env = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), ".env")
+    if os.path.isfile(root_env):
+        return root_env
+    return None
+
+
 class Settings(BaseSettings):
     # Database
     DATABASE_URL: str = "postgresql+asyncpg://postgres:postgres@localhost:5432/locationlens"
@@ -28,8 +41,11 @@ class Settings(BaseSettings):
     # Storage
     UPLOAD_DIR: str = os.path.join(os.path.dirname(os.path.dirname(__file__)), "uploads")
 
+    # Seeding
+    SEED_ON_START: bool = False
+
     class Config:
-        env_file = ".env"
+        env_file = _find_env_file()
 
 
 settings = Settings()
