@@ -3,12 +3,7 @@ import os
 
 
 def _find_env_file() -> str | None:
-    """Look for .env in the application folder or one level up (Docker Compose root)."""
-    # 1) local folder (server/)
-    local_env = os.path.join(os.path.dirname(__file__), ".env")
-    if os.path.isfile(local_env):
-        return local_env
-    # 2) project root (one level up from server/app/ → LocationLens/)
+    """Look for .env in the project root (one level up from server/app/)."""
     root_env = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), ".env")
     if os.path.isfile(root_env):
         return root_env
