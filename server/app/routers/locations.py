@@ -170,16 +170,16 @@ async def reveal_location(
     if existing.scalar_one_or_none():
         return await get_location_with_details(location_id, db)
 
-    if user.coins < 1:
+    if user.coins < settings.REVEAL_COST_COINS:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Not enough coins. Buy more coins to continue.",
         )
 
-    user.coins -= 1
+    user.coins -= settings.REVEAL_COST_COINS
     tx = WalletTransaction(
         user_id=user.id,
-        amount=-1,
+        amount=-settings.REVEAL_COST_COINS,
         type="reveal_location",
         description=f"Revealed location #{location_id}",
     )
@@ -437,10 +437,10 @@ async def review_location(
         author_result = await db.execute(select(User).where(User.id == loc.user_id))
         author = author_result.scalar_one_or_none()
         if author:
-            author.coins += 2
+            author.coins += settings.APPROVAL_REWARD_COINS
             tx = WalletTransaction(
                 user_id=author.id,
-                amount=2,
+                amount=settings.APPROVAL_REWARD_COINS,
                 type="reward",
                 description=f"Reward for approved location #{loc.id}: {loc.title}",
             )

@@ -10,9 +10,6 @@ from app.dependencies import get_current_user
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 
-ADMIN_USERNAME = "admin"
-ADMIN_PASSWORD = "admin123"
-
 
 @router.post("/send-code")
 async def send_code(req: PhoneRequest):
@@ -35,14 +32,14 @@ async def verify_code(req: VerifyCodeRequest, db: AsyncSession = Depends(get_db)
     user = result.scalar_one_or_none()
 
     if user is None:
-        user = User(phone=req.phone, name=req.name or None, coins=10)
+        user = User(phone=req.phone, name=req.name or None, coins=settings.SIGNUP_BONUS_COINS)
         db.add(user)
         await db.commit()
         await db.refresh(user)
 
         tx = WalletTransaction(
             user_id=user.id,
-            amount=10,
+            amount=settings.SIGNUP_BONUS_COINS,
             type="signup_bonus",
             description="Welcome bonus for joining LocationLens",
         )
@@ -59,7 +56,7 @@ async def verify_code(req: VerifyCodeRequest, db: AsyncSession = Depends(get_db)
 @router.post("/admin-login", response_model=TokenResponse)
 async def admin_login(req: AdminLoginRequest):
     """Admin login with username/password."""
-    if req.username != ADMIN_USERNAME or req.password != ADMIN_PASSWORD:
+    if req.username != settings.ADMIN_USERNAME or req.password != settings.ADMIN_PASSWORD:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid admin credentials"
@@ -68,12 +65,17 @@ async def admin_login(req: AdminLoginRequest):
     from app.database import async_session
     async with async_session() as db:
         result = await db.execute(
-            select(User).where(User.phone == "admin_phone")
+            select(User).where(User.phone == settings.ADMIN_PHONE)
         )
         admin_user = result.scalar_one_or_none()
 
         if admin_user is None:
-            admin_user = User(phone="admin_phone", name="Admin", is_admin=True, coins=999999)
+            admin_user = User(
+                phone=settings.ADMIN_PHONE,
+                name="Admin",
+                is_admin=True,
+                coins=settings.ADMIN_INITIAL_COINS,
+            )
             db.add(admin_user)
             await db.commit()
             await db.refresh(admin_user)
