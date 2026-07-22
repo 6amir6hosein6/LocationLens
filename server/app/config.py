@@ -39,6 +39,9 @@ class Settings(BaseSettings):
     # Seeding
     SEED_ON_START: bool = False
 
+    # Upload limits
+    MAX_UPLOAD_SIZE_MB: int = 10
+
     class Config:
         env_file = _find_env_file()
 

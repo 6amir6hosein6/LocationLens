@@ -67,9 +67,21 @@ export default function AddLocation() {
     } catch (e) {}
   };
 
+  const MAX_FILE_SIZE_MB = 10; // Must match backend MAX_UPLOAD_SIZE_MB
+
   const handleFileChange = (e) => {
     const selected = e.target.files[0];
     if (!selected) return;
+
+    // Pre-check file size
+    if (selected.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
+      setError(`File too large. Please choose an image under ${MAX_FILE_SIZE_MB} MB.`);
+      setFile(null);
+      setPreview(null);
+      return;
+    }
+    setError(''); // clear previous size error
+
     if (preview) URL.revokeObjectURL(preview);
     setFile(selected);
     const url = URL.createObjectURL(selected);
@@ -262,7 +274,12 @@ export default function AddLocation() {
 
       setSuccess(true);
     } catch (err) {
-      setError(err.response?.data?.detail || 'Failed to create location');
+      const msg = err.response?.data?.detail;
+      if (err.response?.status === 413 || (typeof msg === 'string' && msg.toLowerCase().includes('too large'))) {
+        setError(`File too large. Please choose an image under ${MAX_FILE_SIZE_MB} MB.`);
+      } else {
+        setError(msg || 'Failed to create location');
+      }
     } finally {
       setLoading(false);
     }
