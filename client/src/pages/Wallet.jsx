@@ -2,22 +2,21 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../services/api';
 
-const PACKAGES = [
-  { id: 'starter', coins: 10, price: '$0.99', label: 'Starter', color: 'blue' },
-  { id: 'popular', coins: 50, price: '$3.99', label: 'Popular', color: 'purple', badge: 'Best Value' },
-  { id: 'premium', coins: 100, price: '$6.99', label: 'Premium', color: 'green' },
-];
-
 export default function Wallet() {
   const [wallet, setWallet] = useState(null);
+  const [packages, setPackages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [buying, setBuying] = useState(null);
   const [showSuccess, setShowSuccess] = useState(false);
 
   const fetchWallet = async () => {
     try {
-      const res = await api.get('/locations/wallet/me');
-      setWallet(res.data);
+      const [walletRes, pkgRes] = await Promise.all([
+        api.get('/locations/wallet/me'),
+        api.get('/locations/wallet/packages'),
+      ]);
+      setWallet(walletRes.data);
+      setPackages(pkgRes.data);
     } catch (err) {
       console.error('Failed to fetch wallet:', err);
     } finally {
@@ -91,39 +90,55 @@ export default function Wallet() {
         {/* Buy Coins */}
         <h3 className="text-lg font-semibold mb-3">Buy Coins</h3>
         <div className="space-y-3 mb-8">
-          {PACKAGES.map((pkg) => (
-            <div
-              key={pkg.id}
-              className={`bg-white rounded-xl p-4 flex items-center justify-between shadow-sm border-2 ${
-                pkg.badge ? 'border-purple-400' : 'border-transparent'
-              }`}
-            >
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className="font-semibold">{pkg.label}</span>
-                  {pkg.badge && (
-                    <span className="bg-purple-100 text-purple-700 text-xs px-2 py-0.5 rounded-full font-medium">
-                      {pkg.badge}
-                    </span>
-                  )}
+          {packages.length === 0 ? (
+            <div className="space-y-3">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="bg-white rounded-xl p-4 shadow-sm border-2 border-transparent animate-pulse">
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-2 w-1/2">
+                      <div className="h-4 bg-gray-200 rounded w-20" />
+                      <div className="h-3 bg-gray-200 rounded w-24" />
+                    </div>
+                    <div className="h-8 bg-gray-200 rounded w-20" />
+                  </div>
                 </div>
-                <p className="text-sm text-gray-500">{pkg.coins} coins</p>
-              </div>
-              <button
-                onClick={() => handleBuy(pkg.id)}
-                disabled={buying !== null}
-                className={`px-5 py-2 rounded-lg font-medium text-white transition-colors ${
-                  pkg.color === 'blue'
-                    ? 'bg-blue-600 hover:bg-blue-700'
-                    : pkg.color === 'purple'
-                    ? 'bg-purple-600 hover:bg-purple-700'
-                    : 'bg-green-600 hover:bg-green-700'
-                } disabled:opacity-50`}
-              >
-                {buying === pkg.id ? 'Buying...' : pkg.price}
-              </button>
+              ))}
             </div>
-          ))}
+          ) : (
+            packages.map((pkg) => (
+              <div
+                key={pkg.id}
+                className={`bg-white rounded-xl p-4 flex items-center justify-between shadow-sm border-2 ${
+                  pkg.badge ? 'border-purple-400' : 'border-transparent'
+                }`}
+              >
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="font-semibold">{pkg.label}</span>
+                    {pkg.badge && (
+                      <span className="bg-purple-100 text-purple-700 text-xs px-2 py-0.5 rounded-full font-medium">
+                        {pkg.badge}
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-sm text-gray-500">{pkg.coins} coins</p>
+                </div>
+                <button
+                  onClick={() => handleBuy(pkg.id)}
+                  disabled={buying !== null}
+                  className={`px-5 py-2 rounded-lg font-medium text-white transition-colors ${
+                    pkg.color === 'blue'
+                      ? 'bg-blue-600 hover:bg-blue-700'
+                      : pkg.color === 'purple'
+                      ? 'bg-purple-600 hover:bg-purple-700'
+                      : 'bg-green-600 hover:bg-green-700'
+                  } disabled:opacity-50`}
+                >
+                  {buying === pkg.id ? 'Buying...' : pkg.price}
+                </button>
+              </div>
+            ))
+          )}
         </div>
 
         {/* Transaction History */}

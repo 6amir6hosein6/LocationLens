@@ -17,7 +17,7 @@ from app.schemas import (
     LocationApproval, RatingCreate, RatingResponse,
 )
 from app.dependencies import get_current_user, get_admin_user
-from app.config import settings
+from app.config import settings, COIN_PACKAGES
 
 router = APIRouter(prefix="/api/locations", tags=["locations"])
 
@@ -349,11 +349,13 @@ async def get_wallet(
     )
 
 
-COIN_PACKAGES = {
-    "starter": {"coins": 10, "price": "$0.99"},
-    "popular": {"coins": 50, "price": "$3.99"},
-    "premium": {"coins": 100, "price": "$6.99"},
-}
+@router.get("/wallet/packages")
+async def get_coin_packages():
+    """Return available coin purchase packages (coins and prices from env config)."""
+    return [
+        {"id": key, **value}
+        for key, value in COIN_PACKAGES.items()
+    ]
 
 
 @router.post("/wallet/buy", response_model=WalletResponse)

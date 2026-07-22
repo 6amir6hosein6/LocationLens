@@ -42,8 +42,41 @@ class Settings(BaseSettings):
     # Upload limits
     MAX_UPLOAD_SIZE_MB: int = 10
 
+    # Coin purchase packages (coins, price in local currency)
+    COIN_PKG_STARTER_COINS: int = 10
+    COIN_PKG_STARTER_PRICE: str = "0.99"
+    COIN_PKG_POPULAR_COINS: int = 50
+    COIN_PKG_POPULAR_PRICE: str = "3.99"
+    COIN_PKG_PREMIUM_COINS: int = 100
+    COIN_PKG_PREMIUM_PRICE: str = "6.99"
+
     class Config:
         env_file = _find_env_file()
+        extra = "ignore"
 
 
 settings = Settings()
+
+
+# Assemble the packages dict from individual env settings so the router can import it.
+COIN_PACKAGES = {
+    "starter": {
+        "coins": settings.COIN_PKG_STARTER_COINS,
+        "price": f"${settings.COIN_PKG_STARTER_PRICE}",
+        "label": "Starter",
+        "color": "blue",
+    },
+    "popular": {
+        "coins": settings.COIN_PKG_POPULAR_COINS,
+        "price": f"${settings.COIN_PKG_POPULAR_PRICE}",
+        "label": "Popular",
+        "color": "purple",
+        "badge": "Best Value",
+    },
+    "premium": {
+        "coins": settings.COIN_PKG_PREMIUM_COINS,
+        "price": f"${settings.COIN_PKG_PREMIUM_PRICE}",
+        "label": "Premium",
+        "color": "green",
+    },
+}
