@@ -37,3 +37,10 @@ id_rsa
 id_rsa.pub
 *Git
 *Git.pub
+
+# Android / Capacitor
+client/android/
+client/capacitor.config.json
+*.apk
+*.aab
+*.jks
