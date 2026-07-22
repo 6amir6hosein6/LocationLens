@@ -26,6 +26,13 @@ async def verify_code(req: VerifyCodeRequest, db: AsyncSession = Depends(get_db)
             detail="Invalid verification code"
         )
 
+    # Prevent the admin phone from being used via normal phone login.
+    if req.phone == settings.ADMIN_PHONE:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="This phone number is reserved. Please use the admin panel login."
+        )
+
     from app.schemas import VerifyCodeRequest
 
     result = await db.execute(select(User).where(User.phone == req.phone))
@@ -77,8 +84,16 @@ async def admin_login(req: AdminLoginRequest):
                 coins=settings.ADMIN_INITIAL_COINS,
             )
             db.add(admin_user)
-            await db.commit()
-            await db.refresh(admin_user)
+        elif not admin_user.is_admin:
+            # Fix a stale non-admin record (e.g. created via phone flow before guard was added).
+            admin_user.is_admin = True
+        else:
+            # Ensure the latest admin config fields are up-to-date.
+            admin_user.name = "Admin"
+            admin_user.coins = settings.ADMIN_INITIAL_COINS
+
+        await db.commit()
+        await db.refresh(admin_user)
 
     token = create_access_token(data={"sub": str(admin_user.id)})
     return TokenResponse(

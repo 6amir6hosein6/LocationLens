@@ -1,0 +1,9 @@
+{
+  "appId": "com.locationlens.app",
+  "appName": "LocationLens",
+  "webDir": "dist",
+  "server": {
+    "url": "https://lens.amirhossein-service.ir",
+    "cleartext": false
+  }
+}
