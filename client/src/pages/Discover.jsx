@@ -48,20 +48,12 @@ export default function DashboardPage() {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="flex-1 flex items-center justify-center bg-gray-50">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-      </div>
-    );
-  }
-
   return (
     <div className="flex-1 bg-gray-50 overflow-y-auto">
       <div className="max-w-2xl mx-auto px-4 py-6 pb-8">
 
         {/* Profile Card */}
-        {user && (
+        {user ? (
           <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 mb-5">
             <div className="flex items-center gap-4">
               <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-2xl font-bold">
@@ -75,10 +67,21 @@ export default function DashboardPage() {
                 <div className="flex items-center gap-3 mt-2">
                   <span className="text-sm font-bold text-yellow-600">🪙 {user.coins}</span>
                   <span className="text-xs text-gray-400">|</span>
-                  <span className="text-xs text-gray-500">{stats?.total_submitted || 0} submitted</span>
+                  <span className="text-xs text-gray-500">{stats?.total_submitted ?? '-'} submitted</span>
                   <span className="text-xs text-gray-400">|</span>
-                  <span className="text-xs text-gray-500">{revealed.length} revealed</span>
+                  <span className="text-xs text-gray-500">{revealed.length ?? '-'} revealed</span>
                 </div>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 mb-5 animate-pulse">
+            <div className="flex items-center gap-4">
+              <div className="w-16 h-16 rounded-full bg-gray-200" />
+              <div className="flex-1 space-y-2">
+                <div className="h-4 bg-gray-200 rounded w-1/3" />
+                <div className="h-3 bg-gray-200 rounded w-1/4" />
+                <div className="h-3 bg-gray-200 rounded w-1/2" />
               </div>
             </div>
           </div>
@@ -110,17 +113,15 @@ export default function DashboardPage() {
         </div>
 
         {/* Stats Cards */}
-        {stats && (
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
-            <StatCard emoji="🪙" value={stats.coins} label="Coins" color="yellow" />
-            <StatCard emoji="📍" value={stats.total_submitted} label="Submitted" color="blue" />
-            <StatCard emoji="✅" value={stats.approved} label="Approved" color="green" />
-            <StatCard emoji="🔍" value={stats.revealed_count} label="Revealed" color="purple" />
-          </div>
-        )}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
+          <StatCard emoji="🪙" value={stats?.coins} label="Coins" color="yellow" loading={loading} />
+          <StatCard emoji="📍" value={stats?.total_submitted} label="Submitted" color="blue" loading={loading} />
+          <StatCard emoji="✅" value={stats?.approved} label="Approved" color="green" loading={loading} />
+          <StatCard emoji="🔍" value={stats?.revealed_count} label="Revealed" color="purple" loading={loading} />
+        </div>
 
         {/* Approval Rate */}
-        {stats && stats.total_submitted > 0 && (
+        {stats && stats.total_submitted > 0 ? (
           <div className="bg-white rounded-xl p-4 shadow-sm mb-5">
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm font-medium text-gray-700">Approval Rate</span>
@@ -138,7 +139,20 @@ export default function DashboardPage() {
               <span>{stats.pending} pending</span>
             </div>
           </div>
-        )}
+        ) : loading ? (
+          <div className="bg-white rounded-xl p-4 shadow-sm mb-5 animate-pulse">
+            <div className="flex items-center justify-between mb-2">
+              <div className="h-4 bg-gray-200 rounded w-24" />
+              <div className="h-4 bg-gray-200 rounded w-10" />
+            </div>
+            <div className="w-full bg-gray-200 rounded-full h-2" />
+            <div className="flex justify-between mt-2">
+              <div className="h-3 bg-gray-200 rounded w-16" />
+              <div className="h-3 bg-gray-200 rounded w-16" />
+              <div className="h-3 bg-gray-200 rounded w-16" />
+            </div>
+          </div>
+        ) : null}
 
         {/* Tabs */}
         <div className="flex gap-1 bg-gray-100 rounded-xl p-1 mb-5">
@@ -157,8 +171,10 @@ export default function DashboardPage() {
               }`}
             >
               {t.label}
-              {t.count !== undefined && (
+              {t.count !== undefined ? (
                 <span className="ml-1 text-xs text-gray-400">({t.count})</span>
+              ) : (
+                <span className="ml-1 text-xs text-gray-400">(-)</span>
               )}
             </button>
           ))}
@@ -170,15 +186,16 @@ export default function DashboardPage() {
             submissions={submissions}
             expandedId={expandedLocation}
             onToggle={(id) => setExpandedLocation(expandedLocation === id ? null : id)}
+            loading={loading}
           />
         )}
 
         {tab === 'revealed' && (
-          <RevealedList revealed={revealed} />
+          <RevealedList revealed={revealed} loading={loading} />
         )}
 
         {tab === 'leaderboard' && (
-          <LeaderboardList leaderboard={leaderboard} />
+          <LeaderboardList leaderboard={leaderboard} loading={loading} />
         )}
       </div>
     </div>
@@ -186,24 +203,52 @@ export default function DashboardPage() {
 }
 
 
-function StatCard({ emoji, value, label, color }) {
+function StatCard({ emoji, value, label, color, loading }) {
   const colors = {
     yellow: 'bg-yellow-50 border-yellow-200',
     blue: 'bg-blue-50 border-blue-200',
     green: 'bg-green-50 border-green-200',
     purple: 'bg-purple-50 border-purple-200',
   };
+  if (loading) {
+    return (
+      <div className={`rounded-xl p-3 text-center border ${colors[color]} animate-pulse`}>
+        <div className="h-6 bg-gray-200 rounded w-6 mx-auto mb-1" />
+        <div className="h-7 bg-gray-200 rounded w-12 mx-auto mt-1" />
+        <div className="h-3 bg-gray-200 rounded w-16 mx-auto mt-1" />
+      </div>
+    );
+  }
   return (
     <div className={`rounded-xl p-3 text-center border ${colors[color]}`}>
       <span className="text-2xl">{emoji}</span>
-      <p className="text-2xl font-bold text-gray-800 mt-1">{value}</p>
+      <p className="text-2xl font-bold text-gray-800 mt-1">{value ?? '-'}</p>
       <p className="text-xs text-gray-500">{label}</p>
     </div>
   );
 }
 
 
-function SubmissionsList({ submissions, expandedId, onToggle }) {
+function SubmissionsList({ submissions, expandedId, onToggle, loading }) {
+  if (loading) {
+    return (
+      <div className="space-y-3">
+        {[1, 2, 3].map((i) => (
+          <div key={i} className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100 animate-pulse p-3">
+            <div className="flex items-center gap-3">
+              <div className="w-16 h-16 rounded-lg bg-gray-200 flex-shrink-0" />
+              <div className="flex-1 space-y-2">
+                <div className="h-4 bg-gray-200 rounded w-2/3" />
+                <div className="h-3 bg-gray-200 rounded w-1/2" />
+              </div>
+              <div className="h-6 bg-gray-200 rounded w-16" />
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
   if (submissions.length === 0) {
     return (
       <EmptyState
@@ -301,8 +346,26 @@ function SubmissionsList({ submissions, expandedId, onToggle }) {
 }
 
 
-function RevealedList({ revealed }) {
+function RevealedList({ revealed, loading }) {
   const [expandedId, setExpandedId] = useState(null);
+
+  if (loading) {
+    return (
+      <div className="space-y-3">
+        {[1, 2, 3].map((i) => (
+          <div key={i} className="bg-white rounded-xl shadow-sm overflow-hidden border border-purple-200 animate-pulse p-3">
+            <div className="flex items-center gap-3">
+              <div className="w-16 h-16 rounded-lg bg-gray-200 flex-shrink-0" />
+              <div className="flex-1 space-y-2">
+                <div className="h-4 bg-gray-200 rounded w-2/3" />
+                <div className="h-3 bg-gray-200 rounded w-1/2" />
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  }
 
   if (revealed.length === 0) {
     return (
@@ -381,7 +444,25 @@ function RevealedList({ revealed }) {
 }
 
 
-function LeaderboardList({ leaderboard }) {
+function LeaderboardList({ leaderboard, loading }) {
+  if (loading) {
+    return (
+      <div className="space-y-2">
+        {[1, 2, 3, 4, 5].map((i) => (
+          <div key={i} className="bg-white rounded-xl p-3 flex items-center gap-3 shadow-sm animate-pulse">
+            <div className="h-4 bg-gray-200 rounded w-6" />
+            <div className="w-8 h-8 rounded-full bg-gray-200 flex-shrink-0" />
+            <div className="flex-1 space-y-2">
+              <div className="h-4 bg-gray-200 rounded w-1/3" />
+              <div className="h-3 bg-gray-200 rounded w-1/4" />
+            </div>
+            <div className="h-4 bg-gray-200 rounded w-12" />
+          </div>
+        ))}
+      </div>
+    );
+  }
+
   if (leaderboard.length === 0) {
     return (
       <EmptyState
