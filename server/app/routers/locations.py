@@ -666,6 +666,7 @@ async def get_ratings(
                 "id": rat.id,
                 "stars": rat.stars,
                 "comment": rat.comment,
+                "user_id": rat.user_id,
                 "user_name": rat.user.name or f"User #{rat.user.id}",
                 "created_at": rat.created_at.isoformat(),
             }

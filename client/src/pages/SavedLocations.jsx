@@ -40,6 +40,20 @@ function RatingSection({ locationId }) {
   const [done, setDone] = useState(false);
   const [loading, setLoading] = useState(true);
 
+  // Read current user ID once from localStorage (not reactive, just persisted).
+  const currentUserId = (() => {
+    try {
+      const u = JSON.parse(localStorage.getItem('user') || '{}');
+      return u.id || null;
+    } catch {
+      return null;
+    }
+  })();
+
+  // Check whether the current user already has a rating in the fetched list.
+  const alreadyRated =
+    currentUserId != null && data.ratings.some((r) => r.user_id === currentUserId);
+
   const loadRatings = () => {
     api.get(`/locations/${locationId}/ratings`)
       .then((r) => {
@@ -92,7 +106,7 @@ function RatingSection({ locationId }) {
       </div>
 
       {/* Rating form */}
-      {!done ? (
+      {!done && !alreadyRated ? (
         <div className="bg-blue-50 rounded-xl p-4 mb-3">
           <p className="text-sm font-semibold text-gray-700 mb-2">Rate & comment on this location</p>
           <StarRating value={myStars} onChange={setMyStars} />
@@ -114,7 +128,7 @@ function RatingSection({ locationId }) {
         </div>
       ) : (
         <div className="bg-green-50 text-green-700 text-sm px-4 py-3 rounded-xl mb-3 font-medium">
-          Thanks for your rating! Refresh to rate again.
+          You have already rated this location. Thank you!
         </div>
       )}
 
