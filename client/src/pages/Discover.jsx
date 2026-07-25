@@ -2,11 +2,12 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { MapContainer, TileLayer, Marker } from 'react-leaflet';
 import api from '../services/api';
+import { fa, faDate, faDateTime } from '../utils/persianNum';
 
 const STATUS_STYLES = {
-  pending: { bg: 'bg-yellow-50', border: 'border-yellow-200', text: 'text-yellow-700', label: 'Pending Review' },
-  approved: { bg: 'bg-green-50', border: 'border-green-200', text: 'text-green-700', label: 'Approved' },
-  rejected: { bg: 'bg-red-50', border: 'border-red-200', text: 'text-red-700', label: 'Rejected' },
+  pending: { bg: 'bg-yellow-50', border: 'border-yellow-200', text: 'text-yellow-700', label: 'در انتظار بررسی' },
+  approved: { bg: 'bg-green-50', border: 'border-green-200', text: 'text-green-700', label: 'تایید شده' },
+  rejected: { bg: 'bg-red-50', border: 'border-red-200', text: 'text-red-700', label: 'رد شده' },
 };
 
 const MEDAL_EMOJI = ['🥇', '🥈', '🥉'];
@@ -42,7 +43,7 @@ export default function DashboardPage() {
       setRevealed(revRes.data);
       setLeaderboard(lbRes.data);
     } catch (err) {
-      console.error('Dashboard load failed:', err);
+      console.error('خطا در بارگذاری داشبورد:', err);
     } finally {
       setLoading(false);
     }
@@ -61,15 +62,15 @@ export default function DashboardPage() {
               </div>
               <div className="flex-1">
                 <h2 className="text-lg font-bold text-gray-900">
-                  {user.name || `Photographer #${user.id}`}
+                  {user.name || `عکاس #${fa(user.id)}`}
                 </h2>
-                <p className="text-xs text-gray-400">ID: #{user.id} · {user.is_admin ? 'Admin' : 'Photographer'}</p>
+                <p className="text-xs text-gray-400">شناسه: #{fa(user.id)} · {user.is_admin ? 'مدیر' : 'عکاس'}</p>
                 <div className="flex items-center gap-3 mt-2">
-                  <span className="text-sm font-bold text-yellow-600">🪙 {user.coins}</span>
+                  <span className="text-sm font-bold text-yellow-600">🪙 {fa(user.coins)}</span>
                   <span className="text-xs text-gray-400">|</span>
-                  <span className="text-xs text-gray-500">{stats?.total_submitted ?? '-'} submitted</span>
+                  <span className="text-xs text-gray-500">{fa(stats?.total_submitted ?? '-')} ارسال شده</span>
                   <span className="text-xs text-gray-400">|</span>
-                  <span className="text-xs text-gray-500">{revealed.length ?? '-'} revealed</span>
+                  <span className="text-xs text-gray-500">{fa(revealed.length ?? '-')} کشف شده</span>
                 </div>
               </div>
             </div>
@@ -93,9 +94,9 @@ export default function DashboardPage() {
             onClick={() => navigate('/swipe')}
             className="bg-gradient-to-br from-blue-500 to-blue-700 rounded-2xl p-4 text-left text-white active:scale-[0.98] transition-transform shadow-lg shadow-blue-200"
           >
-            <p className="text-white/70 text-xs mb-1">Ready to explore?</p>
-            <p className="text-lg font-bold">Start Swiping</p>
-            <p className="text-white/60 text-xs mt-0.5">Discover new spots</p>
+            <p className="text-white/70 text-xs mb-1">آماده کاوش؟</p>
+            <p className="text-lg font-bold">شروع کشف مکان‌ها</p>
+            <p className="text-white/60 text-xs mt-0.5">مکان‌های جدید را کشف کن</p>
           </button>
 
           <button
@@ -107,25 +108,25 @@ export default function DashboardPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
               </svg>
             </div>
-            <p className="font-semibold text-gray-800 text-sm">Add Location</p>
-            <p className="text-[11px] text-gray-400 mt-0.5">Earn 2 coins per approval</p>
+            <p className="font-semibold text-gray-800 text-sm">افزودن مکان</p>
+            <p className="text-[11px] text-gray-400 mt-0.5">به ازای هر تایید ۲ سکه بگیر</p>
           </button>
         </div>
 
         {/* Stats Cards */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
-          <StatCard emoji="🪙" value={stats?.coins} label="Coins" color="yellow" loading={loading} />
-          <StatCard emoji="📍" value={stats?.total_submitted} label="Submitted" color="blue" loading={loading} />
-          <StatCard emoji="✅" value={stats?.approved} label="Approved" color="green" loading={loading} />
-          <StatCard emoji="🔍" value={stats?.revealed_count} label="Revealed" color="purple" loading={loading} />
+          <StatCard emoji="🪙" value={fa(stats?.coins)} label="سکه" color="yellow" loading={loading} />
+          <StatCard emoji="📍" value={fa(stats?.total_submitted)} label="ارسال‌شده" color="blue" loading={loading} />
+          <StatCard emoji="✅" value={fa(stats?.approved)} label="تاییدشده" color="green" loading={loading} />
+          <StatCard emoji="🔍" value={fa(stats?.revealed_count)} label="کشف‌شده" color="purple" loading={loading} />
         </div>
 
         {/* Approval Rate */}
         {stats && stats.total_submitted > 0 ? (
           <div className="bg-white rounded-xl p-4 shadow-sm mb-5">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium text-gray-700">Approval Rate</span>
-              <span className="text-sm font-bold text-gray-800">{stats.approval_rate}%</span>
+              <span className="text-sm font-medium text-gray-700">نرخ تایید</span>
+              <span className="text-sm font-bold text-gray-800">{fa(stats.approval_rate)}%</span>
             </div>
             <div className="w-full bg-gray-200 rounded-full h-2">
               <div
@@ -134,9 +135,9 @@ export default function DashboardPage() {
               />
             </div>
             <div className="flex justify-between mt-2 text-xs text-gray-400">
-              <span>{stats.approved} approved</span>
-              <span>{stats.rejected} rejected</span>
-              <span>{stats.pending} pending</span>
+              <span>{fa(stats.approved)} تایید شده</span>
+              <span>{fa(stats.rejected)} رد شده</span>
+              <span>{fa(stats.pending)} در انتظار</span>
             </div>
           </div>
         ) : loading ? (
@@ -157,9 +158,9 @@ export default function DashboardPage() {
         {/* Tabs */}
         <div className="flex gap-1 bg-gray-100 rounded-xl p-1 mb-5">
           {[
-            { id: 'submissions', label: 'My Submissions', count: submissions.length },
-            { id: 'revealed', label: 'Saved Locations', count: revealed.length },
-            { id: 'leaderboard', label: 'Leaderboard' },
+            { id: 'submissions', label: 'ارسال‌های من', count: submissions.length },
+            { id: 'revealed', label: 'مکان‌های ذخیره', count: revealed.length },
+            { id: 'leaderboard', label: 'جدول امتیازات' },
           ].map((t) => (
             <button
               key={t.id}
@@ -172,7 +173,7 @@ export default function DashboardPage() {
             >
               {t.label}
               {t.count !== undefined ? (
-                <span className="ml-1 text-xs text-gray-400">({t.count})</span>
+                <span className="ml-1 text-xs text-gray-400">({fa(t.count)})</span>
               ) : (
                 <span className="ml-1 text-xs text-gray-400">(-)</span>
               )}
@@ -253,10 +254,10 @@ function SubmissionsList({ submissions, expandedId, onToggle, loading }) {
     return (
       <EmptyState
         emoji="📝"
-        title="No submissions yet"
-        description="Add your first portrait location and earn coins!"
+        title="هنوز ارسالی نداری"
+        description="اولین مکان پرتره خود را اضافه کن و سکه بگیر!"
         linkTo="/add"
-        linkText="Add Location"
+        linkText="افزودن مکان"
       />
     );
   }
@@ -287,7 +288,7 @@ function SubmissionsList({ submissions, expandedId, onToggle, loading }) {
                   <p className="text-xs text-gray-400 truncate">📍 {loc.address}</p>
                 )}
                 <p className="text-xs text-gray-400 mt-0.5">
-                  {new Date(loc.created_at).toLocaleDateString()}
+                  {faDate(loc.created_at)}
                 </p>
               </div>
               <div className="flex flex-col items-end gap-1">
@@ -322,18 +323,18 @@ function SubmissionsList({ submissions, expandedId, onToggle, loading }) {
 
                 <div className="flex items-center justify-between text-xs text-gray-400">
                   <span>{loc.latitude.toFixed(4)}, {loc.longitude.toFixed(4)}</span>
-                  <span>{loc.image_count} photo(s)</span>
+                  <span>{fa(loc.image_count)} عکس</span>
                 </div>
 
                 {loc.status === 'rejected' && loc.rejection_reason && (
                   <div className="mt-2 bg-red-50 text-red-600 text-xs p-2 rounded-lg">
-                    Rejection reason: {loc.rejection_reason}
+                    دلیل رد: {loc.rejection_reason}
                   </div>
                 )}
 
                 {loc.status === 'approved' && (
                   <div className="mt-2 bg-green-50 text-green-600 text-xs p-2 rounded-lg">
-                    Earned +2 coins on {new Date(loc.approved_at).toLocaleDateString()}
+                    +۲ سکه دریافت شده در {faDate(loc.approved_at)}
                   </div>
                 )}
               </div>
@@ -371,10 +372,10 @@ function RevealedList({ revealed, loading }) {
     return (
       <EmptyState
         emoji="🔍"
-        title="No saved locations yet"
-        description="Swipe right on a location to reveal and save it here."
+        title="هنوز مکان ذخیره‌ای نداری"
+        description="روی یک مکان راست بکش تا کشف و اینجا ذخیره شود."
         linkTo="/swipe"
-        linkText="Start Swiping"
+        linkText="شروع کشف مکان‌ها"
       />
     );
   }
@@ -403,7 +404,7 @@ function RevealedList({ revealed, loading }) {
                 <p className="text-xs text-gray-400 truncate">📍 {loc.address}</p>
               )}
               <p className="text-xs text-gray-400 mt-0.5">
-                by {loc.posted_by}
+                توسط {loc.posted_by}
               </p>
             </div>
             <span className="text-xs text-gray-400">
@@ -433,7 +434,7 @@ function RevealedList({ revealed, loading }) {
 
               <div className="flex items-center justify-between text-xs text-gray-400">
                 <span>{loc.latitude.toFixed(4)}, {loc.longitude.toFixed(4)}</span>
-                <span>Revealed {new Date(loc.revealed_at).toLocaleDateString()}</span>
+                <span>کشف‌شده در {faDate(loc.revealed_at)}</span>
               </div>
             </div>
           )}
@@ -467,10 +468,10 @@ function LeaderboardList({ leaderboard, loading }) {
     return (
       <EmptyState
         emoji="🏆"
-        title="No rankings yet"
-        description="Be the first to get a location approved!"
+        title="هنوز رتبه‌ای ثبت نشده"
+        description="اولین نفری باش که یک مکان تایید می‌گیری!"
         linkTo="/add"
-        linkText="Add Location"
+        linkText="افزودن مکان"
       />
     );
   }
@@ -488,7 +489,7 @@ function LeaderboardList({ leaderboard, loading }) {
             {entry.rank <= 3 ? (
               <span className="text-xl">{MEDAL_EMOJI[entry.rank - 1]}</span>
             ) : (
-              <span className="text-sm font-bold text-gray-400">#{entry.rank}</span>
+              <span className="text-sm font-bold text-gray-400">#{fa(entry.rank)}</span>
             )}
           </div>
           <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
@@ -496,10 +497,10 @@ function LeaderboardList({ leaderboard, loading }) {
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-semibold truncate">{entry.name}</p>
-            <p className="text-xs text-gray-400">{entry.approved_count} approved location(s)</p>
+            <p className="text-xs text-gray-400">{fa(entry.approved_count)} مکان تاییدشده</p>
           </div>
           <div className="text-right flex-shrink-0">
-            <p className="text-sm font-bold text-yellow-600">🪙 {entry.coins}</p>
+            <p className="text-sm font-bold text-yellow-600">🪙 {fa(entry.coins)}</p>
           </div>
         </div>
       ))}

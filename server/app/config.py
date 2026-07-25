@@ -42,8 +42,47 @@ class Settings(BaseSettings):
     # Upload limits
     MAX_UPLOAD_SIZE_MB: int = 10
 
+    # Coin purchase packages (coins, price in local currency)
+    COIN_PKG_BRONZE_COINS: int = 10
+    COIN_PKG_BRONZE_PRICE: str = "۳۵۰,۰۰۰ ریال"
+    COIN_PKG_SILVER_COINS: int = 20
+    COIN_PKG_SILVER_PRICE: str = "۵۵۰,۰۰۰ ریال"
+    COIN_PKG_GOLD_COINS: int = 50
+    COIN_PKG_GOLD_PRICE: str = "۱,۲۵۰,۰۰۰ ریال"
+
     class Config:
         env_file = _find_env_file()
+        extra = "ignore"
 
 
 settings = Settings()
+
+
+# Assemble the packages dict from individual env settings so the router can import it.
+COIN_PACKAGES = {
+    "bronze": {
+        "id": "bronze",
+        "coins": settings.COIN_PKG_BRONZE_COINS,
+        "price": settings.COIN_PKG_BRONZE_PRICE,
+        "label": "برنزی",
+        "description": "۱۰ سکه - یک‌بار خرید",
+        "color": "blue",
+    },
+    "silver": {
+        "id": "silver",
+        "coins": settings.COIN_PKG_SILVER_COINS,
+        "price": settings.COIN_PKG_SILVER_PRICE,
+        "label": "نقره‌ای",
+        "description": "۲۰ سکه - یک‌بار خرید",
+        "color": "purple",
+        "badge": "پرفروش",
+    },
+    "gold": {
+        "id": "gold",
+        "coins": settings.COIN_PKG_GOLD_COINS,
+        "price": settings.COIN_PKG_GOLD_PRICE,
+        "label": "طلایی",
+        "description": "۵۰ سکه - یک‌بار خرید",
+        "color": "green",
+    },
+}

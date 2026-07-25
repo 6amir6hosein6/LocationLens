@@ -17,7 +17,7 @@ from app.schemas import (
     LocationApproval, RatingCreate, RatingResponse,
 )
 from app.dependencies import get_current_user, get_admin_user
-from app.config import settings
+from app.config import settings, COIN_PACKAGES
 
 router = APIRouter(prefix="/api/locations", tags=["locations"])
 
@@ -181,7 +181,7 @@ async def reveal_location(
         user_id=user.id,
         amount=-settings.REVEAL_COST_COINS,
         type="reveal_location",
-        description=f"Revealed location #{location_id}",
+        description=f"کشف مکان #{location_id}",
     )
     db.add(tx)
 
@@ -349,11 +349,13 @@ async def get_wallet(
     )
 
 
-COIN_PACKAGES = {
-    "starter": {"coins": 10, "price": "$0.99"},
-    "popular": {"coins": 50, "price": "$3.99"},
-    "premium": {"coins": 100, "price": "$6.99"},
-}
+@router.get("/wallet/packages")
+async def get_coin_packages():
+    """Return available coin purchase packages (coins and prices from env config)."""
+    return [
+        {"id": key, **value}
+        for key, value in COIN_PACKAGES.items()
+    ]
 
 
 @router.post("/wallet/buy", response_model=WalletResponse)
@@ -364,7 +366,7 @@ async def buy_coins(
 ):
     """Mock coin purchase - instantly adds coins."""
     if package not in COIN_PACKAGES:
-        raise HTTPException(status_code=400, detail="Invalid package. Choose: starter, popular, premium")
+        raise HTTPException(status_code=400, detail="بسته نامعتبر. انتخاب کنید: bronze, silver, gold")
 
     pkg = COIN_PACKAGES[package]
     user.coins += pkg["coins"]
@@ -372,7 +374,7 @@ async def buy_coins(
         user_id=user.id,
         amount=pkg["coins"],
         type="purchase",
-        description=f"Purchased {package} package ({pkg['coins']} coins for {pkg['price']})",
+        description=f"خرید بسته {pkg['label']} ({pkg['coins']} سکه به قیمت {pkg['price']})",
     )
     db.add(tx)
     await db.commit()
@@ -442,7 +444,7 @@ async def review_location(
                 user_id=author.id,
                 amount=settings.APPROVAL_REWARD_COINS,
                 type="reward",
-                description=f"Reward for approved location #{loc.id}: {loc.title}",
+                description=f"پاداش برای مکان تاییدشده #{loc.id}: {loc.title}",
             )
             db.add(tx)
 

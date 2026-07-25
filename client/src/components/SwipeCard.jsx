@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback } from 'react';
+import { fa } from '../utils/persianNum';
 
 export default function SwipeCard({ card, onReveal, onSkip, onShowComments }) {
   const [dragX, setDragX] = useState(0);
@@ -30,9 +31,9 @@ export default function SwipeCard({ card, onReveal, onSkip, onShowComments }) {
   const handleEnd = useCallback(() => {
     if (!dragging) return;
     setDragging(false);
-    if (dragX > 100) {
+    if (dragX < -100) {
       onReveal();
-    } else if (dragX < -100) {
+    } else if (dragX > 100) {
       onSkip();
     }
     setDragX(0);
@@ -61,8 +62,8 @@ export default function SwipeCard({ card, onReveal, onSkip, onShowComments }) {
   const rotation = dragX * 0.05;
   const opacity = Math.max(0.5, 1 - Math.abs(dragX) / 600);
   const scale = dragging ? 1.03 : 1;
-  const showReveal = dragX > 40;
-  const showSkip = dragX < -40;
+  const showReveal = dragX < -40;
+  const showSkip = dragX > 40;
 
   const roundedRating = card.avg_rating ? Math.round(card.avg_rating) : 0;
   const imageUrl = card.image?.filename ? `/uploads/${card.image.filename}` : '';
@@ -102,7 +103,7 @@ export default function SwipeCard({ card, onReveal, onSkip, onShowComments }) {
                 <svg className="h-12 w-12 text-gray-500 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
-                <p className="text-gray-500 text-xs">Image unavailable</p>
+                <p className="text-gray-500 text-xs">عکس در دسترس نیست</p>
               </div>
             )}
             <img
@@ -122,7 +123,7 @@ export default function SwipeCard({ card, onReveal, onSkip, onShowComments }) {
             <svg className="h-12 w-12 text-gray-500 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
-            <p className="text-gray-500 text-xs">No image</p>
+            <p className="text-gray-500 text-xs">بدون عکس</p>
           </div>
         )}
 
@@ -136,7 +137,7 @@ export default function SwipeCard({ card, onReveal, onSkip, onShowComments }) {
             <h2 className="text-2xl font-bold leading-tight truncate">{card.title}</h2>
             <div data-no-drag className="flex-shrink-0 bg-black/50 backdrop-blur-md rounded-full px-2 py-0.5 flex items-center gap-1">
               <span className="text-xs">🪙</span>
-              <span className="text-white text-xs font-bold">1</span>
+              <span className="text-white text-xs font-bold">۱</span>
             </div>
           </div>
 
@@ -158,11 +159,11 @@ export default function SwipeCard({ card, onReveal, onSkip, onShowComments }) {
             </div>
             {card.avg_rating ? (
               <>
-                <span className="text-white text-sm font-bold">{Number(card.avg_rating).toFixed(1)}</span>
-                <span className="text-white/40 text-xs">({card.rating_count})</span>
+                <span className="text-white text-sm font-bold">{fa(Number(card.avg_rating).toFixed(1))}</span>
+                <span className="text-white/40 text-xs">({fa(card.rating_count)})</span>
               </>
             ) : (
-              <span className="text-white/30 text-xs">No rating</span>
+              <span className="text-white/30 text-xs">بدون امتیاز</span>
             )}
 
             {/* Comment icon — clickable */}
@@ -175,27 +176,27 @@ export default function SwipeCard({ card, onReveal, onSkip, onShowComments }) {
                   <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                 </svg>
                 <span className="text-white/70 text-[10px] font-medium">
-                  {card.rating_count || 0}
+                  {fa(card.rating_count || 0)}
                 </span>
               </button>
             )}
           </div>
         </div>
 
-        {/* SEE LOCATION stamp */}
+        {/* SEE LOCATION stamp — RTL: appears on the RIGHT when dragged LEFT */}
         {showReveal && (
-          <div className="absolute top-12 left-6 pointer-events-none" style={{ opacity: Math.min(1, (dragX - 40) / 100), transform: `rotate(-15deg) scale(${0.8 + Math.min(0.2, (dragX - 40) / 400)})` }}>
+          <div className="absolute top-12 right-6 pointer-events-none" style={{ opacity: Math.min(1, (Math.abs(dragX) - 40) / 100), transform: `rotate(15deg) scale(${0.8 + Math.min(0.2, (Math.abs(dragX) - 40) / 400)})` }}>
             <div className="border-[3px] border-green-400 rounded-lg px-4 py-1.5 bg-green-400/10 backdrop-blur-sm">
-              <span className="text-green-400 font-extrabold text-xl tracking-wide">SEE LOCATION</span>
+              <span className="text-green-400 font-extrabold text-xl tracking-wide">کشف مکان</span>
             </div>
           </div>
         )}
 
-        {/* SKIP stamp */}
+        {/* SKIP stamp — RTL: appears on the LEFT when dragged RIGHT */}
         {showSkip && (
-          <div className="absolute top-12 right-6 pointer-events-none" style={{ opacity: Math.min(1, (Math.abs(dragX) - 40) / 100), transform: `rotate(15deg) scale(${0.8 + Math.min(0.2, (Math.abs(dragX) - 40) / 400)})` }}>
+          <div className="absolute top-12 left-6 pointer-events-none" style={{ opacity: Math.min(1, (dragX - 40) / 100), transform: `rotate(-15deg) scale(${0.8 + Math.min(0.2, (dragX - 40) / 400)})` }}>
             <div className="border-[3px] border-red-400 rounded-lg px-4 py-1.5 bg-red-400/10 backdrop-blur-sm">
-              <span className="text-red-400 font-extrabold text-xl tracking-wide">SKIP</span>
+              <span className="text-red-400 font-extrabold text-xl tracking-wide">رد کردن</span>
             </div>
           </div>
         )}

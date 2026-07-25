@@ -1,14 +1,14 @@
 {
-  "name": "LocationLens - Discover Portrait Photography Spots",
-  "short_name": "LocationLens",
-  "description": "Find and share beautiful portrait photography locations",
+  "name": "لوکیشن‌لنز - کشف مکان‌های عکاسی پرتره",
+  "short_name": "لوکیشن‌لنز",
+  "description": "مکان‌های عکاسی پرتره زیبا را کشف و به اشتراک بگذارید",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#f9fafb",
   "theme_color": "#2563eb",
   "orientation": "portrait",
   "scope": "/",
-  "lang": "en",
+  "lang": "fa",
   "categories": ["photography", "travel", "lifestyle"],
   "icons": [
     {
