@@ -37,7 +37,7 @@ services:
       dockerfile: Dockerfile
     container_name: locationlens-frontend
     ports:
-      - "1378:80"
+      - "80:80"
     depends_on:
       - backend
     restart: unless-stopped
