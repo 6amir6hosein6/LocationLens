@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import SwipeCard from '../components/SwipeCard';
 import api from '../services/api';
+import { fa, faDate, faDateTime } from '../utils/persianNum';
 
 function StarRow({ stars, size = 'h-4 w-4' }) {
   return (
@@ -41,7 +42,7 @@ export default function SwipeView() {
       setLocations(locRes.data);
       setCoins(meRes.data.coins);
     } catch {
-      setError('Failed to load locations');
+      setError('خطا در بارگذاری مکان‌ها');
     } finally {
       setLoading(false);
     }
@@ -99,7 +100,7 @@ export default function SwipeView() {
     return (
       <div className="flex-1 bg-gray-900 flex flex-col items-center justify-center">
         <div className="animate-spin rounded-full h-10 w-10 border-2 border-blue-500 border-t-transparent mb-4" />
-        <p className="text-gray-400 text-sm">Loading locations...</p>
+        <p className="text-gray-400 text-sm">در حال بارگذاری مکان‌ها...</p>
       </div>
     );
   }
@@ -112,8 +113,8 @@ export default function SwipeView() {
             <path strokeLinecap="round" strokeLinejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
           </svg>
         </div>
-        <h2 className="text-white text-xl font-bold mb-2">All caught up!</h2>
-        <p className="text-gray-400 text-sm text-center mb-6">No more locations to discover right now.<br />Check back later or add your own spots.</p>
+        <h2 className="text-white text-xl font-bold mb-2">همه را دیدی!</h2>
+        <p className="text-gray-400 text-sm text-center mb-6">فعلاً مکان جدیدی برای کشف نیست.<br />بعداً برگرد یا مکان خودت را اضافه کن.</p>
       </div>
     );
   }
@@ -132,7 +133,7 @@ export default function SwipeView() {
         </button>
         <div className="flex items-center gap-1.5 bg-gray-800 rounded-full px-3 py-1.5">
           <span className="text-sm">🪙</span>
-          <span className="text-sm font-bold text-white">{coins}</span>
+          <span className="text-sm font-bold text-white">{fa(coins)}</span>
         </div>
       </div>
 
@@ -141,7 +142,7 @@ export default function SwipeView() {
         {revealLoading && (
           <div className="absolute inset-0 z-30 flex flex-col items-center justify-center bg-black/60">
             <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-400 border-t-transparent mb-3" />
-            <p className="text-white text-sm font-medium">Loading location...</p>
+            <p className="text-white text-sm font-medium">در حال بارگذاری مکان...</p>
           </div>
         )}
         {current && (
@@ -160,20 +161,20 @@ export default function SwipeView() {
       {/* Action buttons */}
       <div className="flex items-center justify-center gap-6 px-4 py-4 flex-shrink-0">
         <button
-          onClick={() => handleSwipe('left')}
+          onClick={() => handleSwipe('right')}
           disabled={revealLoading}
           className="w-16 h-16 rounded-full bg-gray-800 border-2 border-gray-600 flex items-center justify-center active:scale-90 transition-transform disabled:opacity-40"
-          title="Skip"
+          title="رد کردن"
         >
           <svg className="h-7 w-7 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
         <button
-          onClick={() => handleSwipe('right')}
+          onClick={() => handleSwipe('left')}
           disabled={revealLoading || coins < 1}
           className="w-20 h-20 rounded-full bg-blue-600 border-4 border-blue-400 flex items-center justify-center active:scale-90 transition-transform disabled:opacity-40 disabled:cursor-not-allowed shadow-lg shadow-blue-500/30"
-          title="Reveal (1 coin)"
+          title="کشف (۱ سکه)"
         >
           <svg className="h-9 w-9 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
@@ -236,12 +237,12 @@ export default function SwipeView() {
               <div className="w-12 h-1 bg-gray-300 rounded-full mx-auto mb-3" />
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="font-bold text-gray-900">Reviews</h3>
+                  <h3 className="font-bold text-gray-900">نظرات</h3>
                   {sheetData && (
                     <div className="flex items-center gap-2 mt-1">
                       <StarRow stars={Math.round(sheetData.avg_rating || 0)} size="h-3.5 w-3.5" />
                       <span className="text-sm text-gray-600">
-                        {sheetData.avg_rating ? Number(sheetData.avg_rating).toFixed(1) : '0'} · {sheetData.rating_count} review{sheetData.rating_count !== 1 ? 's' : ''}
+                        {sheetData.avg_rating ? fa(Number(sheetData.avg_rating).toFixed(1)) : fa('۰')} · {fa(sheetData.rating_count)} نظر
                       </span>
                     </div>
                   )}
@@ -276,15 +277,15 @@ export default function SwipeView() {
                       {rat.comment && (
                         <p className="text-sm text-gray-600 mt-1">{rat.comment}</p>
                       )}
-                      <p className="text-[10px] text-gray-400 mt-1">{new Date(rat.created_at).toLocaleDateString()}</p>
+                      <p className="text-[10px] text-gray-400 mt-1">{faDate(rat.created_at)}</p>
                     </div>
                   ))}
                 </div>
               ) : (
                 <div className="text-center py-8">
                   <p className="text-3xl mb-2">📝</p>
-                  <p className="text-sm text-gray-500">No reviews yet</p>
-                  <p className="text-xs text-gray-400 mt-1">Be the first to reveal and rate this spot!</p>
+                  <p className="text-sm text-gray-500">هنوز نظری نیست</p>
+                  <p className="text-xs text-gray-400 mt-1">اولین نفری باش که این مکان را کشف و امتیاز می‌دهی!</p>
                 </div>
               )}
             </div>

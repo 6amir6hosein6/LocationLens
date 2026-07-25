@@ -158,7 +158,7 @@ export default function AddLocationModal({ position, onClose, onCreated }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!title.trim()) {
-      setError('Title is required');
+      setError('عنوان الزامی است');
       return;
     }
 
@@ -196,9 +196,9 @@ export default function AddLocationModal({ position, onClose, onCreated }) {
     } catch (err) {
       const msg = err.response?.data?.detail;
       if (err.response?.status === 413 || (typeof msg === 'string' && msg.toLowerCase().includes('too large'))) {
-        setError(`File too large. Please choose an image under ${MAX_FILE_SIZE_MB} MB.`);
+      setError(`حجم فایل بیشتر از حد مجاز است. لطفاً تصویری زیر ${MAX_FILE_SIZE_MB} مگابایت انتخاب کنید.`);
       } else {
-        setError(msg || 'Failed to create location');
+        setError(msg || 'ایجاد مکان ناموفق بود');
       }
     } finally {
       setLoading(false);
@@ -209,7 +209,7 @@ export default function AddLocationModal({ position, onClose, onCreated }) {
     <div className="fixed inset-0 bg-black/50 z-[2000] flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between p-4 border-b">
-          <h2 className="text-lg font-semibold">Add New Location</h2>
+          <h2 className="text-lg font-semibold">افزودن مکان جدید</h2>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
             <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -220,7 +220,7 @@ export default function AddLocationModal({ position, onClose, onCreated }) {
         <form onSubmit={handleSubmit} className="p-4 space-y-4">
           {/* Coordinates */}
           <div className="bg-gray-50 rounded-lg p-3">
-            <p className="text-xs text-gray-500">Selected Coordinates</p>
+            <p className="text-xs text-gray-500">مختصات انتخاب‌شده</p>
             <p className="text-sm font-mono">
               {position[0].toFixed(6)}, {position[1].toFixed(6)}
             </p>
@@ -228,15 +228,15 @@ export default function AddLocationModal({ position, onClose, onCreated }) {
 
           {/* Address */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Address</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">آدرس</label>
             {reverseGeocoding ? (
-              <div className="text-sm text-gray-400">Looking up address...</div>
+              <div className="text-sm text-gray-400">در حال جستجوی آدرس...</div>
             ) : (
               <input
                 type="text"
                 value={address}
                 onChange={(e) => setAddress(e.target.value)}
-                placeholder="Auto-detected from coordinates"
+                placeholder="خودکار از مختصات"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
               />
             )}
@@ -245,13 +245,13 @@ export default function AddLocationModal({ position, onClose, onCreated }) {
           {/* Title */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Location Title <span className="text-red-500">*</span>
+              عنوان مکان <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="e.g., Sunset Park Bridge"
+              placeholder="مثلاً پل پارک غروب"
               required
               className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
             />
@@ -259,11 +259,11 @@ export default function AddLocationModal({ position, onClose, onCreated }) {
 
           {/* Description */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">توضیحات</label>
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Why is this a great location for portrait photography?"
+              placeholder="چرا این مکان برای عکاسی پرتره عالی است؟"
               rows={2}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none resize-none"
             />
@@ -271,19 +271,19 @@ export default function AddLocationModal({ position, onClose, onCreated }) {
 
           {/* Image Upload */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Photo</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">عکس</label>
             <div
               onClick={() => fileInputRef.current?.click()}
               className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center cursor-pointer hover:border-blue-400 transition-colors"
             >
               {preview ? (
-                <img src={preview} alt="Preview" className="max-h-40 mx-auto rounded-lg" />
+                <img src={preview} alt="پیش‌نمایش" className="max-h-40 mx-auto rounded-lg" />
               ) : (
                 <div>
                   <svg className="h-8 w-8 text-gray-400 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                   </svg>
-                  <p className="text-sm text-gray-500">Click to upload a photo</p>
+                  <p className="text-sm text-gray-500">برای آپلود عکس کلیک کنید</p>
                 </div>
               )}
             </div>
@@ -299,16 +299,16 @@ export default function AddLocationModal({ position, onClose, onCreated }) {
           {/* EXIF Data Display */}
           {file && (
             <div className="bg-gray-50 rounded-lg p-3 space-y-2">
-              <p className="text-xs font-medium text-gray-700">Image Metadata</p>
+              <p className="text-xs font-medium text-gray-700">اطلاعات عکس</p>
               {exifData.camera_make && (
                 <div className="flex justify-between text-xs">
-                  <span className="text-gray-500">Camera</span>
+                  <span className="text-gray-500">دوربین</span>
                   <span>{exifData.camera_make} {exifData.camera_model}</span>
                 </div>
               )}
               {exifData.taken_at && (
                 <div className="flex justify-between text-xs">
-                  <span className="text-gray-500">Taken at</span>
+                  <span className="text-gray-500">تاریخ عکاسی</span>
                   <span>{exifData.taken_at}</span>
                 </div>
               )}
@@ -320,30 +320,30 @@ export default function AddLocationModal({ position, onClose, onCreated }) {
               )}
               {exifData.aperture && (
                 <div className="flex justify-between text-xs">
-                  <span className="text-gray-500">Aperture</span>
+                  <span className="text-gray-500">دیافراگم</span>
                   <span>{exifData.aperture}</span>
                 </div>
               )}
               {exifData.shutter_speed && (
                 <div className="flex justify-between text-xs">
-                  <span className="text-gray-500">Shutter</span>
+                  <span className="text-gray-500">سرعت شاتر</span>
                   <span>{exifData.shutter_speed}</span>
                 </div>
               )}
               {exifData.focal_length && (
                 <div className="flex justify-between text-xs">
-                  <span className="text-gray-500">Focal Length</span>
+                  <span className="text-gray-500">فاصله کانونی</span>
                   <span>{exifData.focal_length}</span>
                 </div>
               )}
               {exifData.width && (
                 <div className="flex justify-between text-xs">
-                  <span className="text-gray-500">Resolution</span>
+                  <span className="text-gray-500">رزولوشن</span>
                   <span>{exifData.width} x {exifData.height}</span>
                 </div>
               )}
               {!exifData.camera_make && !exifData.taken_at && !exifData.iso && (
-                <p className="text-xs text-gray-400">No EXIF data found in image</p>
+                <p className="text-xs text-gray-400">اطلاعات EXIF در عکس یافت نشد</p>
               )}
             </div>
           )}
@@ -352,7 +352,7 @@ export default function AddLocationModal({ position, onClose, onCreated }) {
           {file && (
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1">Date Taken</label>
+                <label className="block text-xs font-medium text-gray-700 mb-1">تاریخ عکاسی</label>
                 <input
                   type="date"
                   value={manualDate}
@@ -361,7 +361,7 @@ export default function AddLocationModal({ position, onClose, onCreated }) {
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1">Time Taken</label>
+                <label className="block text-xs font-medium text-gray-700 mb-1">زمان عکاسی</label>
                 <input
                   type="time"
                   value={manualTime}
@@ -374,11 +374,11 @@ export default function AddLocationModal({ position, onClose, onCreated }) {
 
           {/* Image Description */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Photo Description</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">توضیحات عکس</label>
             <textarea
               value={imageDescription}
               onChange={(e) => setImageDescription(e.target.value)}
-              placeholder="Describe this photo..."
+              placeholder="این عکس را توصیف کن..."
               rows={2}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none resize-none"
             />
@@ -392,14 +392,14 @@ export default function AddLocationModal({ position, onClose, onCreated }) {
               onClick={onClose}
               className="flex-1 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
             >
-              Cancel
+              انصراف
             </button>
             <button
               type="submit"
               disabled={loading}
               className="flex-1 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
             >
-              {loading ? 'Saving...' : 'Save Location'}
+              {loading ? 'در حال ذخیره...' : 'ذخیره مکان'}
             </button>
           </div>
         </form>

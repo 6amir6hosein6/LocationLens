@@ -181,7 +181,7 @@ async def reveal_location(
         user_id=user.id,
         amount=-settings.REVEAL_COST_COINS,
         type="reveal_location",
-        description=f"Revealed location #{location_id}",
+        description=f"کشف مکان #{location_id}",
     )
     db.add(tx)
 
@@ -366,7 +366,7 @@ async def buy_coins(
 ):
     """Mock coin purchase - instantly adds coins."""
     if package not in COIN_PACKAGES:
-        raise HTTPException(status_code=400, detail="Invalid package. Choose: starter, popular, premium")
+        raise HTTPException(status_code=400, detail="بسته نامعتبر. انتخاب کنید: bronze, silver, gold")
 
     pkg = COIN_PACKAGES[package]
     user.coins += pkg["coins"]
@@ -374,7 +374,7 @@ async def buy_coins(
         user_id=user.id,
         amount=pkg["coins"],
         type="purchase",
-        description=f"Purchased {package} package ({pkg['coins']} coins for {pkg['price']})",
+        description=f"خرید بسته {pkg['label']} ({pkg['coins']} سکه به قیمت {pkg['price']})",
     )
     db.add(tx)
     await db.commit()
@@ -444,7 +444,7 @@ async def review_location(
                 user_id=author.id,
                 amount=settings.APPROVAL_REWARD_COINS,
                 type="reward",
-                description=f"Reward for approved location #{loc.id}: {loc.title}",
+                description=f"پاداش برای مکان تاییدشده #{loc.id}: {loc.title}",
             )
             db.add(tx)
 

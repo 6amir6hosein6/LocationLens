@@ -55,7 +55,7 @@ export default function SearchBar({ onSelect }) {
           onChange={handleChange}
           onFocus={() => results.length > 0 && setShowResults(true)}
           onBlur={() => setTimeout(() => setShowResults(false), 200)}
-          placeholder="Search locations..."
+          placeholder="جستجوی مکان‌ها..."
           className="w-full pl-10 pr-4 py-3 rounded-xl shadow-lg border-0 outline-none text-sm"
         />
         {loading && (

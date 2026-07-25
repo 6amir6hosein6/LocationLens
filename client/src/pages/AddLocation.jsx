@@ -38,7 +38,7 @@ export default function AddLocation() {
 
   const getMyLocation = () => {
     if (!navigator.geolocation) {
-      setError('Geolocation not supported by your browser');
+      setError('موقعیت‌یاب توسط مرورگر شما پشتیبانی نمی‌شود');
       return;
     }
     setGettingLocation(true);
@@ -52,7 +52,7 @@ export default function AddLocation() {
       },
       () => {
         if (!latitude && !longitude) {
-          setGpsError('Could not get GPS. Select a pin on the map below.');
+          setGpsError('دریافت GPS امکان‌پذیر نبود. روی نقشه پین بگذارید.');
         }
         setGettingLocation(false);
       }
@@ -75,7 +75,7 @@ export default function AddLocation() {
 
     // Pre-check file size
     if (selected.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
-      setError(`File too large. Please choose an image under ${MAX_FILE_SIZE_MB} MB.`);
+        setError(`حجم فایل بیشتر از حد مجاز است. لطفاً تصویری زیر ${MAX_FILE_SIZE_MB} مگابایت انتخاب کنید.`);
       setFile(null);
       setPreview(null);
       return;
@@ -242,10 +242,10 @@ export default function AddLocation() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!title.trim()) { setError('Title is required'); return; }
-    if (!latitude || !longitude) { setError('Please select a location on the map'); return; }
-    if (!province) { setError('Please select a province'); return; }
-    if (!file) { setError('Please upload a photo'); return; }
+    if (!title.trim()) {       setError('عنوان الزامی است'); return; }
+    if (!latitude || !longitude) { setError('لطفاً روی نقشه یک مکان انتخاب کنید'); return; }
+    if (!province) { setError('لطفاً استان را انتخاب کنید'); return; }
+    if (!file) { setError('لطفاً یک عکس آپلود کنید'); return; }
 
     setLoading(true);
     setError('');
@@ -276,9 +276,9 @@ export default function AddLocation() {
     } catch (err) {
       const msg = err.response?.data?.detail;
       if (err.response?.status === 413 || (typeof msg === 'string' && msg.toLowerCase().includes('too large'))) {
-        setError(`File too large. Please choose an image under ${MAX_FILE_SIZE_MB} MB.`);
+      setError(`حجم فایل بیشتر از حد مجاز است. لطفاً تصویری زیر ${MAX_FILE_SIZE_MB} مگابایت انتخاب کنید.`);
       } else {
-        setError(msg || 'Failed to create location');
+        setError(msg || 'ایجاد مکان ناموفق بود');
       }
     } finally {
       setLoading(false);
@@ -290,16 +290,16 @@ export default function AddLocation() {
       <div className="flex-1 flex items-center justify-center bg-gray-50 px-4">
         <div className="text-center max-w-sm">
           <p className="text-5xl mb-4">🎉</p>
-          <h2 className="text-xl font-bold mb-2">Location Submitted!</h2>
+          <h2 className="text-xl font-bold mb-2">مکان ارسال شد!</h2>
           <p className="text-gray-500 text-sm mb-6">
-            Your location is now pending admin review. Once approved, you'll earn 2 coins!
+            مکان شما اکنون در انتظار بررسی مدیر است. پس از تایید، ۲ سکه دریافت می‌کنید!
           </p>
           <div className="flex gap-3">
             <Link
               to="/"
               className="flex-1 py-2.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors text-center font-medium"
             >
-              Back to Home
+              بازگشت به خانه
             </Link>
             <button
               onClick={() => {
@@ -312,7 +312,7 @@ export default function AddLocation() {
               }}
               className="flex-1 py-2.5 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors font-medium"
             >
-              Add Another
+              افزودن مکان دیگر
             </button>
           </div>
         </div>
@@ -327,11 +327,11 @@ export default function AddLocation() {
           <svg className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
-          Back to Home
+          بازگشت به خانه
         </Link>
 
-        <h1 className="text-2xl font-bold mb-1">Add New Location</h1>
-        <p className="text-gray-500 text-sm mb-6">Submit a portrait spot. Earn 2 coins when approved!</p>
+        <h1 className="text-2xl font-bold mb-1">افزودن مکان جدید</h1>
+        <p className="text-gray-500 text-sm mb-6">یک مکان پرتره ثبت کن. وقتی تایید شد ۲ سکه بگیر!</p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
 
@@ -339,14 +339,14 @@ export default function AddLocation() {
           <div className="bg-white rounded-xl p-4 shadow-sm">
             <div className="flex items-center justify-between mb-3">
               <label className="text-sm font-medium text-gray-700">
-                Select Location <span className="text-red-500">*</span>
+                انتخاب مکان <span className="text-red-500">*</span>
               </label>
               <button
                 type="button"
                 onClick={getMyLocation}
                 className="text-xs text-blue-600 hover:text-blue-700 flex items-center gap-1"
               >
-                {gettingLocation ? 'Getting...' : '📍 Use my GPS'}
+                {gettingLocation ? 'در حال دریافت...' : '📍 استفاده از GPS من'}
               </button>
             </div>
             <MapPicker
@@ -360,25 +360,25 @@ export default function AddLocation() {
             {exifData.latitude != null && exifData.longitude != null && (
               <p className="text-xs text-green-600 mt-1.5 flex items-center gap-1">
                 <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
-                GPS coordinates extracted from photo
+                مختصات GPS از عکس استخراج شد
               </p>
             )}
           </div>
 
           {/* ── IRAN ADDRESS ── */}
           <div className="bg-white rounded-xl p-4 shadow-sm space-y-3">
-            <p className="text-sm font-medium text-gray-700">Address</p>
+            <p className="text-sm font-medium text-gray-700">آدرس</p>
 
             {/* Province */}
             <div>
-              <label className="block text-xs text-gray-500 mb-1">Province / استان <span className="text-red-500">*</span></label>
+              <label className="block text-xs text-gray-500 mb-1">استان <span className="text-red-500">*</span></label>
               <select
                 value={province}
                 onChange={(e) => setProvince(e.target.value)}
                 required
                 className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none bg-white"
               >
-                <option value="">Select province...</option>
+                <option value="">انتخاب استان...</option>
                 {PROVINCES.map((p) => (
                   <option key={p} value={p}>{p}</option>
                 ))}
@@ -387,14 +387,14 @@ export default function AddLocation() {
 
             {/* City */}
             <div>
-              <label className="block text-xs text-gray-500 mb-1">City / شهر</label>
+              <label className="block text-xs text-gray-500 mb-1">شهر</label>
               <select
                 value={city}
                 onChange={(e) => setCity(e.target.value)}
                 disabled={!province}
                 className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none bg-white disabled:opacity-40"
               >
-                <option value="">{province ? 'Select city...' : 'Select province first'}</option>
+                <option value="">{province ? 'انتخاب شهر...' : 'ابتدا استان را انتخاب کنید'}</option>
                 {cities.map((c) => (
                   <option key={c} value={c}>{c}</option>
                 ))}
@@ -403,24 +403,24 @@ export default function AddLocation() {
 
             {/* Neighborhood */}
             <div>
-              <label className="block text-xs text-gray-500 mb-1">Neighborhood / محله</label>
+              <label className="block text-xs text-gray-500 mb-1">محله</label>
               <input
                 type="text"
                 value={neighborhood}
                 onChange={(e) => setNeighborhood(e.target.value)}
-                placeholder="e.g. نواب، ونک، تجریش"
+                placeholder="مثلاً نواب، ونک، تجریش"
                 className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
               />
             </div>
 
             {/* Complete address */}
             <div>
-              <label className="block text-xs text-gray-500 mb-1">Complete Address / آدرس کامل</label>
+              <label className="block text-xs text-gray-500 mb-1">آدرس کامل</label>
               <input
                 type="text"
                 value={address}
                 onChange={(e) => setAddress(e.target.value)}
-                placeholder="Street name, building number, etc."
+                placeholder="نام خیابان، شماره ساختمان و..."
                 className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
               />
             </div>
@@ -429,13 +429,13 @@ export default function AddLocation() {
           {/* ── TITLE ── */}
           <div className="bg-white rounded-xl p-4 shadow-sm">
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Location Title <span className="text-red-500">*</span>
+              عنوان مکان <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="e.g., Sunset Park Bridge"
+              placeholder="مثلاً پل پارک غروب"
               required
               className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
             />
@@ -443,11 +443,11 @@ export default function AddLocation() {
 
           {/* ── DESCRIPTION ── */}
           <div className="bg-white rounded-xl p-4 shadow-sm">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">توضیحات</label>
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Why is this a great spot for portraits? Light direction, best times, etc."
+              placeholder="چرا این مکان برای پرتره عالی است؟ جهت نور، بهترین زمان‌ها و..."
               rows={3}
               className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none resize-none"
             />
@@ -456,20 +456,20 @@ export default function AddLocation() {
           {/* ── PHOTO ── */}
           <div className="bg-white rounded-xl p-4 shadow-sm">
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Photo <span className="text-red-500">*</span>
+              عکس <span className="text-red-500">*</span>
             </label>
             <div
               onClick={() => fileInputRef.current?.click()}
               className="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center cursor-pointer hover:border-blue-400 transition-colors"
             >
               {preview ? (
-                <img src={preview} alt="Preview" className="max-h-48 mx-auto rounded-lg" />
+                <img src={preview} alt="پیش‌نمایش" className="max-h-48 mx-auto rounded-lg" />
               ) : (
                 <>
                   <svg className="h-10 w-10 text-gray-400 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                   </svg>
-                  <p className="text-sm text-gray-500">Click to upload a photo</p>
+                  <p className="text-sm text-gray-500">برای آپلود عکس کلیک کنید</p>
                 </>
               )}
             </div>
@@ -479,14 +479,14 @@ export default function AddLocation() {
           {/* ── EXIF INFO ── */}
           {file && (exifData.camera_make || exifData.taken_at || exifData.iso) && (
             <div className="bg-white rounded-xl p-4 shadow-sm">
-              <p className="text-sm font-medium text-gray-700 mb-2">Detected from photo</p>
+              <p className="text-sm font-medium text-gray-700 mb-2">شناسایی‌شده از عکس</p>
               <div className="space-y-1 text-xs text-gray-600">
-                {exifData.camera_make && <div className="flex justify-between"><span className="text-gray-400">Camera</span><span>{exifData.camera_make} {exifData.camera_model}</span></div>}
-                {exifData.taken_at && <div className="flex justify-between"><span className="text-gray-400">Taken</span><span>{exifData.taken_at}</span></div>}
+                {exifData.camera_make && <div className="flex justify-between"><span className="text-gray-400">دوربین</span><span>{exifData.camera_make} {exifData.camera_model}</span></div>}
+                {exifData.taken_at && <div className="flex justify-between"><span className="text-gray-400">تاریخ عکاسی</span><span>{exifData.taken_at}</span></div>}
                 {exifData.iso && <div className="flex justify-between"><span className="text-gray-400">ISO</span><span>{exifData.iso}</span></div>}
-                {exifData.aperture && <div className="flex justify-between"><span className="text-gray-400">Aperture</span><span>{exifData.aperture}</span></div>}
-                {exifData.shutter_speed && <div className="flex justify-between"><span className="text-gray-400">Shutter</span><span>{exifData.shutter_speed}</span></div>}
-                {exifData.width && <div className="flex justify-between"><span className="text-gray-400">Resolution</span><span>{exifData.width} x {exifData.height}</span></div>}
+                {exifData.aperture && <div className="flex justify-between"><span className="text-gray-400">دیافراگم</span><span>{exifData.aperture}</span></div>}
+                {exifData.shutter_speed && <div className="flex justify-between"><span className="text-gray-400">سرعت شاتر</span><span>{exifData.shutter_speed}</span></div>}
+                {exifData.width && <div className="flex justify-between"><span className="text-gray-400">رزولوشن</span><span>{exifData.width} x {exifData.height}</span></div>}
               </div>
             </div>
           )}
@@ -495,9 +495,9 @@ export default function AddLocation() {
           {file && (
             <div className="bg-white rounded-xl p-4 shadow-sm">
               <p className="text-sm font-medium text-gray-700 mb-1">
-                Image Date & Time {exifData.taken_at ? '(auto-filled from EXIF)' : ''}
+                تاریخ و زمان عکس {exifData.taken_at ? '(خودکار از EXIF)' : ''}
               </p>
-              <p className="text-xs text-gray-400 mb-3">Know when the light was — helps others plan their shoot</p>
+              <p className="text-xs text-gray-400 mb-3">                بدان چه زمانی نور عالی بوده — به بقیه در برنامه‌ریزی کمک می‌کند</p>
               <div className="grid grid-cols-2 gap-3">
                 <input type="date" value={manualDate} onChange={(e) => setManualDate(e.target.value)} className="px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none" />
                 <input type="time" value={manualTime} onChange={(e) => setManualTime(e.target.value)} className="px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none" />
@@ -516,11 +516,11 @@ export default function AddLocation() {
             disabled={loading}
             className="w-full py-3.5 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 shadow-sm"
           >
-            {loading ? 'Submitting...' : 'Submit Location'}
+            {loading ? 'در حال ارسال...' : 'ثبت مکان'}
           </button>
 
           <p className="text-xs text-gray-400 text-center pb-4">
-            Your submission will be reviewed by an admin. You'll earn 2 coins upon approval.
+            ارسال شما توسط مدیر بررسی خواهد شد. پس از تایید ۲ سکه دریافت می‌کنید.
           </p>
         </form>
       </div>

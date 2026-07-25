@@ -1,5 +1,6 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { fa, faNum } from '../utils/persianNum';
 
 export default function Navbar() {
   const { user, logout } = useAuth();
@@ -8,17 +9,17 @@ export default function Navbar() {
   if (!user || user.is_admin) return null;
 
   const links = [
-    { to: '/', label: 'Discover', icon: '🔥' },
-    { to: '/add', label: 'Add', icon: '➕' },
-    { to: '/dashboard', label: 'Dashboard', icon: '📊' },
-    { to: '/wallet', label: 'Wallet', icon: '🪙' },
+    { to: '/', label: 'کاوش', icon: '🔥' },
+    { to: '/add', label: 'افزودن', icon: '➕' },
+    { to: '/dashboard', label: 'داشبورد', icon: '📊' },
+    { to: '/wallet', label: 'کیف پول', icon: '🪙' },
   ];
 
   return (
     <nav className="bg-white border-b border-gray-200 px-4 py-2 flex items-center justify-between z-50 relative">
       <Link to="/" className="flex items-center gap-1.5 text-lg font-bold text-blue-600">
         <img src="/icons/logo.svg" alt="" className="w-6 h-6" />
-        LocationLens
+        لوکیشن‌لنز
       </Link>
 
       <div className="flex items-center gap-1">
@@ -32,7 +33,7 @@ export default function Navbar() {
                 : 'text-gray-600 hover:bg-gray-50'
             }`}
           >
-            <span className="mr-1">{link.icon}</span>
+            <span className="ml-1">{link.icon}</span>
             <span className="hidden sm:inline">{link.label}</span>
           </Link>
         ))}
@@ -46,7 +47,7 @@ export default function Navbar() {
           onClick={logout}
           className="text-xs text-gray-400 hover:text-red-500 transition-colors"
         >
-          Logout
+          خروج
         </button>
       </div>
     </nav>

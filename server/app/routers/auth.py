@@ -48,7 +48,7 @@ async def verify_code(req: VerifyCodeRequest, db: AsyncSession = Depends(get_db)
             user_id=user.id,
             amount=settings.SIGNUP_BONUS_COINS,
             type="signup_bonus",
-            description="Welcome bonus for joining LocationLens",
+            description="جایزه خوش‌آمدگویی برای پیوستن به لوکیشن‌لنز",
         )
         db.add(tx)
         await db.commit()

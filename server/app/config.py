@@ -43,12 +43,12 @@ class Settings(BaseSettings):
     MAX_UPLOAD_SIZE_MB: int = 10
 
     # Coin purchase packages (coins, price in local currency)
-    COIN_PKG_STARTER_COINS: int = 10
-    COIN_PKG_STARTER_PRICE: str = "0.99"
-    COIN_PKG_POPULAR_COINS: int = 50
-    COIN_PKG_POPULAR_PRICE: str = "3.99"
-    COIN_PKG_PREMIUM_COINS: int = 100
-    COIN_PKG_PREMIUM_PRICE: str = "6.99"
+    COIN_PKG_BRONZE_COINS: int = 10
+    COIN_PKG_BRONZE_PRICE: str = "۳۵۰,۰۰۰ ریال"
+    COIN_PKG_SILVER_COINS: int = 20
+    COIN_PKG_SILVER_PRICE: str = "۵۵۰,۰۰۰ ریال"
+    COIN_PKG_GOLD_COINS: int = 50
+    COIN_PKG_GOLD_PRICE: str = "۱,۲۵۰,۰۰۰ ریال"
 
     class Config:
         env_file = _find_env_file()
@@ -60,23 +60,29 @@ settings = Settings()
 
 # Assemble the packages dict from individual env settings so the router can import it.
 COIN_PACKAGES = {
-    "starter": {
-        "coins": settings.COIN_PKG_STARTER_COINS,
-        "price": f"${settings.COIN_PKG_STARTER_PRICE}",
-        "label": "Starter",
+    "bronze": {
+        "id": "bronze",
+        "coins": settings.COIN_PKG_BRONZE_COINS,
+        "price": settings.COIN_PKG_BRONZE_PRICE,
+        "label": "برنزی",
+        "description": "۱۰ سکه - یک‌بار خرید",
         "color": "blue",
     },
-    "popular": {
-        "coins": settings.COIN_PKG_POPULAR_COINS,
-        "price": f"${settings.COIN_PKG_POPULAR_PRICE}",
-        "label": "Popular",
+    "silver": {
+        "id": "silver",
+        "coins": settings.COIN_PKG_SILVER_COINS,
+        "price": settings.COIN_PKG_SILVER_PRICE,
+        "label": "نقره‌ای",
+        "description": "۲۰ سکه - یک‌بار خرید",
         "color": "purple",
-        "badge": "Best Value",
+        "badge": "پرفروش",
     },
-    "premium": {
-        "coins": settings.COIN_PKG_PREMIUM_COINS,
-        "price": f"${settings.COIN_PKG_PREMIUM_PRICE}",
-        "label": "Premium",
+    "gold": {
+        "id": "gold",
+        "coins": settings.COIN_PKG_GOLD_COINS,
+        "price": settings.COIN_PKG_GOLD_PRICE,
+        "label": "طلایی",
+        "description": "۵۰ سکه - یک‌بار خرید",
         "color": "green",
     },
 }

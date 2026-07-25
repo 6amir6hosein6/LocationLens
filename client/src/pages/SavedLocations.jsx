@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { MapContainer, TileLayer, Marker } from 'react-leaflet';
 import api from '../services/api';
+import { fa, faDate, faDateTime } from '../utils/persianNum';
 
 function StarRating({ value, onChange, readonly = false, size = 'h-6 w-6' }) {
   const [hover, setHover] = useState(0);
@@ -68,7 +69,7 @@ function RatingSection({ locationId }) {
   }, [locationId]);
 
   const handleSubmit = async () => {
-    if (myStars === 0) { setError('Please select a star rating'); return; }
+    if (myStars === 0) { setError('لطفاً امتیاز ستاره‌ای انتخاب کنید'); return; }
     setSubmitting(true);
     setError('');
     try {
@@ -79,7 +80,7 @@ function RatingSection({ locationId }) {
       setDone(true);
       loadRatings();
     } catch (err) {
-      setError(err.response?.data?.detail || 'Failed to submit rating');
+      setError(err.response?.data?.detail || 'ثبت امتیاز ناموفق بود');
       setDone(false);
     } finally {
       setSubmitting(false);
@@ -97,23 +98,23 @@ function RatingSection({ locationId }) {
         <StarRating value={Math.round(data.avg_rating || 0)} readonly size="h-4 w-4" />
         {data.avg_rating ? (
           <>
-            <span className="text-sm font-bold text-gray-800">{Number(data.avg_rating).toFixed(1)}</span>
-            <span className="text-xs text-gray-400">({data.rating_count} review{data.rating_count !== 1 ? 's' : ''})</span>
+            <span className="text-sm font-bold text-gray-800">{data.avg_rating ? fa(Number(data.avg_rating).toFixed(1)) : fa('۰')}</span>
+            <span className="text-xs text-gray-400">({fa(data.rating_count)} نظر)</span>
           </>
         ) : (
-          <span className="text-xs text-gray-400">No ratings yet — be the first!</span>
+          <span className="text-xs text-gray-400">هنوز امتیازی نیست — اولین نفر باش!</span>
         )}
       </div>
 
       {/* Rating form */}
       {!done && !alreadyRated ? (
         <div className="bg-blue-50 rounded-xl p-4 mb-3">
-          <p className="text-sm font-semibold text-gray-700 mb-2">Rate & comment on this location</p>
+          <p className="text-sm font-semibold text-gray-700 mb-2">این مکان را امتیاز ده و نظر بده</p>
           <StarRating value={myStars} onChange={setMyStars} />
           <textarea
             value={comment}
             onChange={(e) => setComment(e.target.value)}
-            placeholder="Share your experience — light quality, best time, tips..."
+            placeholder="تجربه خود را به اشتراک بگذار — کیفیت نور، بهترین زمان، نکات..."
             rows={3}
             className="w-full mt-3 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none resize-none bg-white"
           />
@@ -123,12 +124,12 @@ function RatingSection({ locationId }) {
             disabled={submitting}
             className="mt-2 w-full py-2.5 bg-blue-600 text-white rounded-xl text-sm font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50"
           >
-            {submitting ? 'Submitting...' : 'Submit Rating & Comment'}
+              {submitting ? 'در حال ثبت...' : 'ثبت امتیاز و نظر'}
           </button>
         </div>
       ) : (
         <div className="bg-green-50 text-green-700 text-sm px-4 py-3 rounded-xl mb-3 font-medium">
-          You have already rated this location. Thank you!
+          شما قبلاً این مکان را امتیاز داده‌اید. متشکرم!
         </div>
       )}
 
@@ -155,7 +156,7 @@ function RatingSection({ locationId }) {
               {rat.comment && (
                 <p className="text-sm text-gray-600 mt-1">{rat.comment}</p>
               )}
-              <p className="text-[10px] text-gray-400 mt-1">{new Date(rat.created_at).toLocaleDateString()}</p>
+              <p className="text-[10px] text-gray-400 mt-1">{faDate(rat.created_at)}</p>
             </div>
           ))}
         </div>
@@ -191,8 +192,8 @@ export default function SavedLocations() {
           <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-4">
             <span className="text-3xl">🔍</span>
           </div>
-          <h2 className="text-lg font-bold text-gray-800 mb-1">No saved locations yet</h2>
-          <p className="text-sm text-gray-400">Swipe right to reveal and save locations here.</p>
+          <h2 className="text-lg font-bold text-gray-800 mb-1">هنوز مکان ذخیره‌شده‌ای نداری</h2>
+          <p className="text-sm text-gray-400">برای کشف و ذخیره مکان‌ها به راست بکش.</p>
         </div>
       </div>
     );
@@ -201,8 +202,8 @@ export default function SavedLocations() {
   return (
     <div className="flex-1 overflow-y-auto bg-gray-50">
       <div className="max-w-lg mx-auto px-4 py-6 pb-8">
-        <h1 className="text-2xl font-bold mb-1">Saved Locations</h1>
-        <p className="text-sm text-gray-400 mb-5">{revealed.length} location{revealed.length !== 1 ? 's' : ''} revealed</p>
+        <h1 className="text-2xl font-bold mb-1">مکان‌های ذخیره‌شده</h1>
+        <p className="text-sm text-gray-400 mb-5">{fa(revealed.length)} مکان کشف شده</p>
 
         <div className="space-y-4">
           {revealed.map((loc) => (
@@ -226,7 +227,7 @@ export default function SavedLocations() {
                   {loc.address && (
                     <p className="text-xs text-gray-400 truncate">{loc.address}</p>
                   )}
-                  <p className="text-xs text-gray-400 mt-0.5">by {loc.posted_by}</p>
+                  <p className="text-xs text-gray-400 mt-0.5">توسط {loc.posted_by}</p>
                 </div>
               </div>
 
@@ -247,7 +248,7 @@ export default function SavedLocations() {
                 </div>
                 <div className="flex items-center justify-between text-xs text-gray-400 mt-2">
                   <span>📍 {loc.latitude.toFixed(4)}, {loc.longitude.toFixed(4)}</span>
-                  <span>Revealed {new Date(loc.revealed_at).toLocaleDateString()}</span>
+                  <span>کشف‌شده در {faDate(loc.revealed_at)}</span>
                 </div>
               </div>
 
