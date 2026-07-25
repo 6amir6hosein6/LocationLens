@@ -109,7 +109,7 @@ function RatingSection({ locationId }) {
       {/* Rating form */}
       {!done && !alreadyRated ? (
         <div className="bg-blue-50 rounded-xl p-4 mb-3">
-          <p className="text-sm font-semibold text-gray-700 mb-2">این مکان را امتیاز ده و نظر بده</p>
+          <p className="text-sm font-semibold text-gray-700 mb-2">به این مکان امتیاز بده و نظرتو بگو</p>
           <StarRating value={myStars} onChange={setMyStars} />
           <textarea
             value={comment}

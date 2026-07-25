@@ -44,11 +44,11 @@ class Settings(BaseSettings):
 
     # Coin purchase packages (coins, price in local currency)
     COIN_PKG_BRONZE_COINS: int = 10
-    COIN_PKG_BRONZE_PRICE: str = "۳۵۰,۰۰۰ ریال"
+    COIN_PKG_BRONZE_PRICE: str = "۳۵,۰۰۰ تومان"
     COIN_PKG_SILVER_COINS: int = 20
-    COIN_PKG_SILVER_PRICE: str = "۵۵۰,۰۰۰ ریال"
+    COIN_PKG_SILVER_PRICE: str = "۵۵,۰۰۰ تومان"
     COIN_PKG_GOLD_COINS: int = 50
-    COIN_PKG_GOLD_PRICE: str = "۱,۲۵۰,۰۰۰ ریال"
+    COIN_PKG_GOLD_PRICE: str = "۱۲۵,۰۰۰ تومان"
 
     class Config:
         env_file = _find_env_file()

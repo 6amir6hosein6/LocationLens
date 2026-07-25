@@ -92,7 +92,7 @@ export default function DashboardPage() {
         <div className="grid grid-cols-2 gap-3 mb-5">
           <button
             onClick={() => navigate('/swipe')}
-            className="bg-gradient-to-br from-blue-500 to-blue-700 rounded-2xl p-4 text-left text-white active:scale-[0.98] transition-transform shadow-lg shadow-blue-200"
+            className="bg-gradient-to-br from-blue-500 to-blue-700 rounded-2xl p-4 text-right text-white active:scale-[0.98] transition-transform shadow-lg shadow-blue-200"
           >
             <p className="text-white/70 text-xs mb-1">آماده کاوش؟</p>
             <p className="text-lg font-bold">شروع کشف مکان‌ها</p>
@@ -101,7 +101,7 @@ export default function DashboardPage() {
 
           <button
             onClick={() => navigate('/add')}
-            className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 active:scale-[0.97] transition-transform text-left"
+            className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 active:scale-[0.97] transition-transform text-right"
           >
             <div className="w-8 h-8 rounded-lg bg-green-50 flex items-center justify-center mb-1.5">
               <svg className="h-4 w-4 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
