@@ -33,8 +33,8 @@ class Settings(BaseSettings):
     REVEAL_COST_COINS: int = 1
     APPROVAL_REWARD_COINS: int = 2
 
-    # Storage
-    UPLOAD_DIR: str = os.path.join(os.path.dirname(os.path.dirname(__file__)), "uploads")
+    # Storage (path used for uploaded images / media)
+    UPLOAD_DIR: str = "uploads"
 
     # Seeding
     SEED_ON_START: bool = False
