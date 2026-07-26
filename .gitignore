@@ -40,6 +40,8 @@ id_rsa.pub
 
 # Android / Capacitor builds
 *.jks
+*.apk
+*.aab
 client/capacitor.config.json
 client/android/.gradle/
 client/android/**/build/
