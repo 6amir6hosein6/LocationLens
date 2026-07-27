@@ -161,7 +161,7 @@ export default function SwipeView() {
       {/* Action buttons */}
       <div className="flex items-center justify-center gap-6 px-4 py-4 flex-shrink-0">
         <button
-          onClick={() => handleSwipe('right')}
+          onClick={() => handleSwipe('left')}
           disabled={revealLoading}
           className="w-16 h-16 rounded-full bg-gray-800 border-2 border-gray-600 flex items-center justify-center active:scale-90 transition-transform disabled:opacity-40"
           title="رد کردن"
@@ -171,7 +171,7 @@ export default function SwipeView() {
           </svg>
         </button>
         <button
-          onClick={() => handleSwipe('left')}
+          onClick={() => handleSwipe('right')}
           disabled={revealLoading || coins < 1}
           className="w-20 h-20 rounded-full bg-blue-600 border-4 border-blue-400 flex items-center justify-center active:scale-90 transition-transform disabled:opacity-40 disabled:cursor-not-allowed shadow-lg shadow-blue-500/30"
           title="کشف (۱ سکه)"
