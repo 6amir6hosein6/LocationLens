@@ -52,9 +52,7 @@ export default function SwipeCard({ card, onReveal, onSkip, onShowComments }) {
     handleStart(e.touches[0].clientX, e.touches[0].clientY);
   };
   const onTouchMove = (e) => {
-    if (dragging && Math.abs(dragX) > 5) {
-      e.preventDefault();
-    }
+    // Don't call preventDefault() — touchmove is passive on Android WebView
     handleMove(e.touches[0].clientX, e.touches[0].clientY);
   };
   const onTouchEnd = () => handleEnd();
