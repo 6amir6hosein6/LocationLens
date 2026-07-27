@@ -70,5 +70,35 @@
       }
     </script>
     <script type="module" src="/src/main.jsx"></script>
+    <script>
+      // Hide native splash screen after React renders + minimum 3 seconds
+      (function() {
+        const START = performance.now();
+        const MIN_MS = 3000;
+
+        function ready() {
+          return document.getElementById('root')?.children?.length > 0;
+        }
+
+        function tryHide() {
+          const elapsed = performance.now() - START;
+          if (!ready() || elapsed < MIN_MS) {
+            setTimeout(tryHide, 100);
+            return;
+          }
+          try {
+            if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.SplashScreen) {
+              window.Capacitor.Plugins.SplashScreen.hide();
+            }
+          } catch (e) {}
+        }
+
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', tryHide);
+        } else {
+          tryHide();
+        }
+      })();
+    </script>
   </body>
 </html>
