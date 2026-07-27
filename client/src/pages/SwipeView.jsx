@@ -127,9 +127,9 @@ export default function SwipeView() {
           onClick={() => navigate('/')}
           className="w-9 h-9 rounded-full bg-gray-800 flex items-center justify-center"
         >
-          <svg className="h-5 w-5 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-          </svg>
+            <svg className="h-5 w-5 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+            </svg>
         </button>
         <div className="flex items-center gap-1.5 bg-gray-800 rounded-full px-3 py-1.5">
           <span className="text-sm">🪙</span>

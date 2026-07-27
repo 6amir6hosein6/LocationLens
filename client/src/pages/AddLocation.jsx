@@ -325,7 +325,7 @@ export default function AddLocation() {
       <div className="max-w-lg mx-auto px-4 py-6 pb-8">
         <Link to="/" className="inline-flex items-center text-sm text-gray-500 hover:text-gray-700 mb-4">
           <svg className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
           </svg>
           بازگشت به خانه
         </Link>
