@@ -729,3 +729,63 @@ async def get_location(location_id: int, db: AsyncSession = Depends(get_db), use
     if not location:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Location not found")
     return location
+
+
+# ─── ADMIN DELETE ─────────────────────────────────────────
+
+@router.delete("/admin/{location_id}")
+async def admin_delete_location(
+    location_id: int,
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_admin_user),
+):
+    """Admin: permanently delete a location and its images."""
+    result = await db.execute(
+        select(Location).options(selectinload(Location.images)).where(Location.id == location_id)
+    )
+    loc = result.scalar_one_or_none()
+    if not loc:
+        raise HTTPException(status_code=404, detail="Location not found")
+
+    # Remove physical image files
+    upload_dir = settings.UPLOAD_DIR
+    for img in loc.images:
+        try:
+            os.remove(os.path.join(upload_dir, img.filename))
+        except OSError:
+            pass
+
+    await db.delete(loc)
+    await db.commit()
+    return {"message": "Location deleted"}
+
+
+# ─── USER SELF-DELETE ─────────────────────────────────────
+
+@router.delete("/mine/{location_id}")
+async def user_delete_own_location(
+    location_id: int,
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_current_user),
+):
+    """User: delete their own location (any status)."""
+    result = await db.execute(
+        select(Location).options(selectinload(Location.images)).where(Location.id == location_id)
+    )
+    loc = result.scalar_one_or_none()
+    if not loc:
+        raise HTTPException(status_code=404, detail="Location not found")
+    if loc.user_id != user.id:
+        raise HTTPException(status_code=403, detail="You can only delete your own locations")
+
+    # Remove physical image files
+    upload_dir = settings.UPLOAD_DIR
+    for img in loc.images:
+        try:
+            os.remove(os.path.join(upload_dir, img.filename))
+        except OSError:
+            pass
+
+    await db.delete(loc)
+    await db.commit()
+    return {"message": "Location deleted"}

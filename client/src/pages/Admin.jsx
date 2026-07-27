@@ -71,6 +71,21 @@ export default function Admin() {
     }
   };
 
+  const handleDelete = async (locationId) => {
+    if (!confirm('آیا مطمئنی می‌خوای این مکان رو حذف کنی؟')) return;
+    try {
+      await api.delete(`/locations/admin/${locationId}`);
+      setPending((prev) => prev.filter((loc) => loc.id !== locationId));
+      setSelectedLocation(null);
+      setStats((prev) => ({
+        ...prev,
+        pending: prev.pending - 1,
+      }));
+    } catch (err) {
+      setError(err.response?.data?.detail || 'Failed to delete');
+    }
+  };
+
   if (isLogin) {
     return (
       <div className="flex-1 flex items-center justify-center bg-gray-50 px-4">
@@ -232,6 +247,12 @@ export default function Admin() {
                         رد کردن
                       </button>
                     </div>
+                    <button
+                      onClick={() => handleDelete(loc.id)}
+                      className="w-full mt-2 py-1.5 bg-gray-200 text-gray-600 rounded-lg hover:bg-gray-300 transition-colors text-xs font-medium"
+                    >
+                      🗑️ حذف مکان
+                    </button>
                   </div>
                 </div>
               </div>

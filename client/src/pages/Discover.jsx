@@ -187,6 +187,7 @@ export default function DashboardPage() {
             submissions={submissions}
             expandedId={expandedLocation}
             onToggle={(id) => setExpandedLocation(expandedLocation === id ? null : id)}
+            onDelete={handleDelete}
             loading={loading}
           />
         )}
@@ -230,7 +231,7 @@ function StatCard({ emoji, value, label, color, loading }) {
 }
 
 
-function SubmissionsList({ submissions, expandedId, onToggle, loading }) {
+function SubmissionsList({ submissions, expandedId, onToggle, onDelete, loading }) {
   if (loading) {
     return (
       <div className="space-y-3">
@@ -266,7 +267,17 @@ function SubmissionsList({ submissions, expandedId, onToggle, loading }) {
     <div className="space-y-3">
       {submissions.map((loc) => {
         const style = STATUS_STYLES[loc.status] || STATUS_STYLES.pending;
-        return (
+  const handleDelete = async (locationId) => {
+    if (!confirm('آیا مطمئنی می‌خوای این مکان رو حذف کنی؟')) return;
+    try {
+      await api.delete(`/locations/mine/${locationId}`);
+      setSubmissions((prev) => prev.filter((loc) => loc.id !== locationId));
+    } catch (err) {
+      console.error('خطا در حذف:', err);
+    }
+  };
+
+  return (
           <div
             key={loc.id}
             className={`bg-white rounded-xl shadow-sm overflow-hidden border ${style.border}`}
@@ -337,6 +348,16 @@ function SubmissionsList({ submissions, expandedId, onToggle, loading }) {
                     +۲ سکه دریافت شده در {faDate(loc.approved_at)}
                   </div>
                 )}
+
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onDelete(loc.id);
+                  }}
+                  className="w-full mt-2 py-1.5 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors text-xs font-medium"
+                >
+                  🗑️ حذف مکان
+                </button>
               </div>
             )}
           </div>
