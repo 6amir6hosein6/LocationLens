@@ -64,7 +64,7 @@ export default function SwipeCard({ card, onReveal, onSkip, onShowComments }) {
   const showSkip = dragX > 40;
 
   const roundedRating = card.avg_rating ? Math.round(card.avg_rating) : 0;
-  const imageUrl = card.image?.filename ? `/uploads/${card.image.filename}` : (card.image_url || card.images?.[0]?.filename ? `/uploads/${card.images[0].filename}` : '');
+  const imageUrl = card.image?.filename ? `https://lens.amirhossein-service.ir/uploads/${card.image.filename}` : (card.image_url || card.images?.[0]?.filename ? `https://lens.amirhossein-service.ir/uploads/${card.images[0].filename}` : '');
 
   return (
     <div

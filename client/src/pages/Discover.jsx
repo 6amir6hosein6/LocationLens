@@ -23,6 +23,16 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [expandedLocation, setExpandedLocation] = useState(null);
 
+  const handleDelete = async (locationId) => {
+    if (!confirm('آیا مطمئنی می‌خوای این مکان رو حذف کنی؟')) return;
+    try {
+      await api.delete(`/locations/mine/${locationId}`);
+      setSubmissions((prev) => prev.filter((loc) => loc.id !== locationId));
+    } catch (err) {
+      console.error('خطا در حذف:', err);
+    }
+  };
+
   useEffect(() => {
     loadAll();
   }, []);
@@ -267,16 +277,6 @@ function SubmissionsList({ submissions, expandedId, onToggle, onDelete, loading 
     <div className="space-y-3">
       {submissions.map((loc) => {
         const style = STATUS_STYLES[loc.status] || STATUS_STYLES.pending;
-  const handleDelete = async (locationId) => {
-    if (!confirm('آیا مطمئنی می‌خوای این مکان رو حذف کنی؟')) return;
-    try {
-      await api.delete(`/locations/mine/${locationId}`);
-      setSubmissions((prev) => prev.filter((loc) => loc.id !== locationId));
-    } catch (err) {
-      console.error('خطا در حذف:', err);
-    }
-  };
-
   return (
           <div
             key={loc.id}

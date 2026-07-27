@@ -180,7 +180,7 @@ export default function Admin() {
                   {loc.images && loc.images.length > 0 && (
                     <div className="md:w-64 h-48 md:h-auto">
                       <img
-                        src={`/uploads/${loc.images[0].filename}`}
+                        src={`https://lens.amirhossein-service.ir/uploads/${loc.images[0].filename}`}
                         alt={loc.title}
                         className="w-full h-full object-cover"
                       />

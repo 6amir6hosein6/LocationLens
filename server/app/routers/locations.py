@@ -312,7 +312,7 @@ async def create_location(
         .where(Location.id == location.id)
     )
     loc = result.scalar_one()
-    thumbnail = f"/uploads/{loc.images[0].filename}" if loc.images else None
+    thumbnail = f"https://lens.amirhossein-service.ir/uploads/{loc.images[0].filename}" if loc.images else None
     return LocationBrief(
         id=loc.id,
         title=loc.title,
@@ -501,7 +501,7 @@ async def get_my_submissions(
             "rejection_reason": loc.rejection_reason,
             "created_at": loc.created_at.isoformat(),
             "approved_at": loc.approved_at.isoformat() if loc.approved_at else None,
-            "thumbnail": f"/uploads/{loc.images[0].filename}" if loc.images else None,
+            "thumbnail": f"https://lens.amirhossein-service.ir/uploads/{loc.images[0].filename}" if loc.images else None,
             "image_count": len(loc.images),
         }
         for loc in locations
@@ -540,7 +540,7 @@ async def get_my_revealed(
             "city": loc.city,
             "neighborhood": loc.neighborhood,
             "description": loc.description,
-            "thumbnail": f"/uploads/{img.filename}" if img else None,
+            "thumbnail": f"https://lens.amirhossein-service.ir/uploads/{img.filename}" if img else None,
             "posted_by": loc.user.name or f"Photographer #{loc.user.id}",
             "revealed_at": rev.revealed_at.isoformat(),
             "images": [ImageResponse.model_validate(img)],
