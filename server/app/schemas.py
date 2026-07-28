@@ -1,6 +1,24 @@
+import re
 from pydantic import BaseModel
 from datetime import datetime
 from typing import Optional, List
+
+
+# Iranian mobile numbers: optional +98 or leading 0, then 9 followed by 9 digits.
+# Keep this in sync with the frontend validator in client/src/utils/validation.js.
+IRAN_PHONE_REGEX = re.compile(r"^(\+98|0)?9\d{9}$")
+
+
+def normalize_iranian_phone(phone: str) -> Optional[str]:
+    """Return the phone normalized to a leading-0 local format, or None if invalid."""
+    phone = (phone or "").strip()
+    if not IRAN_PHONE_REGEX.match(phone):
+        return None
+    if phone.startswith("+98"):
+        return "0" + phone[3:]
+    if not phone.startswith("0"):
+        return "0" + phone
+    return phone
 
 
 # User schemas
@@ -149,6 +167,12 @@ class TransactionResponse(BaseModel):
 
 class BuyCoinsRequest(BaseModel):
     package: str
+
+
+# Push notification schemas
+class PushTokenRequest(BaseModel):
+    token: str
+    platform: str = "android"
 
 
 # Admin schemas

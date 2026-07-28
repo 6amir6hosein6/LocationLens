@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { fa, faNum } from '../utils/persianNum';
+import { fa, faNum, toEnglishDigits } from '../utils/persianNum';
+import { isValidIranianPhone } from '../utils/validation';
 
 export default function Register() {
   const [step, setStep] = useState('phone');
@@ -16,6 +17,10 @@ export default function Register() {
   const handleSendCode = async (e) => {
     e.preventDefault();
     setError('');
+    if (!isValidIranianPhone(phone)) {
+      setError('شماره تلفن همراه معتبر نیست (مثال: ۰۹۱۲۳۴۵۶۷۸۹)');
+      return;
+    }
     setLoading(true);
     try {
       await sendCode(phone);
@@ -69,8 +74,9 @@ export default function Register() {
               </label>
               <input
                 type="tel"
+                inputMode="numeric"
                 value={phone}
-                onChange={(e) => setPhone(e.target.value)}
+                onChange={(e) => setPhone(toEnglishDigits(e.target.value).replace(/[^\d+]/g, ''))}
                 placeholder="۰۹۱۲ ۳۴۵ ۶۷۸۹"
                 required
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none mb-4"
@@ -95,8 +101,10 @@ export default function Register() {
               </label>
               <input
                 type="text"
+                inputMode="numeric"
+                pattern="[0-9]*"
                 value={code}
-                onChange={(e) => setCode(e.target.value)}
+                onChange={(e) => setCode(toEnglishDigits(e.target.value).replace(/\D/g, '').slice(0, 6))}
                 placeholder="کد ۶ رقمی را وارد کنید"
                 required
                 maxLength={6}

@@ -18,6 +18,7 @@ from app.schemas import (
 )
 from app.dependencies import get_current_user, get_admin_user
 from app.config import settings, COIN_PACKAGES
+from app.push import send_push_to_all
 
 router = APIRouter(prefix="/api/locations", tags=["locations"])
 
@@ -468,6 +469,15 @@ async def review_location(
             db.add(tx)
 
     await db.commit()
+
+    if approval.status == LocationStatus.APPROVED.value:
+        await send_push_to_all(
+            db,
+            title="مکان جدید اضافه شد",
+            body=loc.title,
+            data={"type": "new_location", "location_id": str(loc.id)},
+        )
+
     return {"message": f"Location {approval.status}"}
 
 

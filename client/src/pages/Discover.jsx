@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { MapContainer, TileLayer, Marker } from 'react-leaflet';
 import api from '../services/api';
+import { useAppReady } from '../contexts/AppReadyContext';
 import { fa, faDate, faDateTime } from '../utils/persianNum';
 
 const STATUS_STYLES = {
@@ -22,6 +23,7 @@ export default function DashboardPage() {
   const [leaderboard, setLeaderboard] = useState([]);
   const [loading, setLoading] = useState(true);
   const [expandedLocation, setExpandedLocation] = useState(null);
+  const { markReady } = useAppReady();
 
   const handleDelete = async (locationId) => {
     if (!confirm('آیا مطمئنی می‌خوای این مکان رو حذف کنی؟')) return;
@@ -58,6 +60,7 @@ export default function DashboardPage() {
       console.error('خطا در بارگذاری داشبورد:', err);
     } finally {
       setLoading(false);
+      markReady();
     }
   };
 

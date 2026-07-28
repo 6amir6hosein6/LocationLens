@@ -96,6 +96,19 @@ class RevealedLocation(Base):
     location = relationship("Location")
 
 
+class PushToken(Base):
+    __tablename__ = "push_tokens"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    token = Column(String(500), unique=True, index=True, nullable=False)
+    platform = Column(String(20), default="android", nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    last_seen_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    user = relationship("User")
+
+
 class Rating(Base):
     __tablename__ = "ratings"
 

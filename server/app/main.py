@@ -7,7 +7,7 @@ from fastapi.responses import JSONResponse
 
 from app.config import settings
 from app.database import init_db
-from app.routers import auth, locations, search
+from app.routers import auth, locations, search, push
 
 
 @asynccontextmanager
@@ -50,6 +50,7 @@ app.add_middleware(
 app.include_router(auth.router)
 app.include_router(locations.router)
 app.include_router(search.router)
+app.include_router(push.router)
 
 app.mount("/uploads", StaticFiles(directory=settings.UPLOAD_DIR), name="uploads")
 

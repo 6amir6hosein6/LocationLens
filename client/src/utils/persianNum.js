@@ -3,6 +3,7 @@
  * Handles strings with mixed text/numbers (e.g. dates, prices, descriptions).
  */
 const PERSIAN_DIGITS = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
+const ARABIC_INDIC_DIGITS = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
 
 export function fa(input) {
   if (input === null || input === undefined) return '';
@@ -11,6 +12,19 @@ export function fa(input) {
 
 export function faNum(num) {
   return fa(num);
+}
+
+/**
+ * Convert Persian/Arabic-Indic digits (as typed by mobile keyboards set to
+ * Farsi/Arabic) back to Latin digits, e.g. for numeric inputs and validation.
+ */
+export function toEnglishDigits(input) {
+  if (input === null || input === undefined) return '';
+  return String(input).replace(/[۰-۹٠-٩]/g, (d) => {
+    const persianIdx = PERSIAN_DIGITS.indexOf(d);
+    if (persianIdx !== -1) return String(persianIdx);
+    return String(ARABIC_INDIC_DIGITS.indexOf(d));
+  });
 }
 
 /**

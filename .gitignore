@@ -38,6 +38,11 @@ id_rsa.pub
 *Git
 *Git.pub
 
+# Firebase / push notification secrets
+client/android/app/google-services.json
+server/firebase-service-account.json
+firebase-service-account.json
+
 # Android / Capacitor builds
 *.jks
 *.apk

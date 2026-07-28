@@ -3,7 +3,14 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from app.database import get_db
 from app.models import User, WalletTransaction
-from app.schemas import PhoneRequest, VerifyCodeRequest, TokenResponse, UserResponse, AdminLoginRequest
+from app.schemas import (
+    PhoneRequest,
+    VerifyCodeRequest,
+    TokenResponse,
+    UserResponse,
+    AdminLoginRequest,
+    normalize_iranian_phone,
+)
 from app.auth import create_access_token
 from app.config import settings
 from app.dependencies import get_current_user
@@ -14,12 +21,26 @@ router = APIRouter(prefix="/api/auth", tags=["auth"])
 @router.post("/send-code")
 async def send_code(req: PhoneRequest):
     """Mock SMS send - always succeeds. In production, integrate with Twilio/etc."""
-    return {"message": "Code sent successfully", "phone": req.phone}
+    phone = normalize_iranian_phone(req.phone)
+    if phone is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid Iranian mobile phone number"
+        )
+    return {"message": "Code sent successfully", "phone": phone}
 
 
 @router.post("/verify-code", response_model=TokenResponse)
 async def verify_code(req: VerifyCodeRequest, db: AsyncSession = Depends(get_db)):
     """Verify SMS code. For now, only '123456' is accepted."""
+    phone = normalize_iranian_phone(req.phone)
+    if phone is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid Iranian mobile phone number"
+        )
+    req.phone = phone
+
     if req.code != settings.MOCK_SMS_CODE:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,

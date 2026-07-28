@@ -42,6 +42,11 @@ class Settings(BaseSettings):
     # Upload limits
     MAX_UPLOAD_SIZE_MB: int = 10
 
+    # Push notifications (Firebase Cloud Messaging)
+    # Path to the Firebase service-account JSON (Project Settings > Service accounts > Generate new private key).
+    # Never commit this file - keep it outside the repo or gitignored.
+    FIREBASE_CREDENTIALS_PATH: str = "firebase-service-account.json"
+
     # Coin purchase packages (coins, price in local currency)
     COIN_PKG_BRONZE_COINS: int = 10
     COIN_PKG_BRONZE_PRICE: str = "۳۵,۰۰۰ تومان"
