@@ -172,6 +172,7 @@ class AdminLocationPending(BaseModel):
     province: Optional[str] = None
     city: Optional[str] = None
     neighborhood: Optional[str] = None
+    status: str = "pending"
     created_at: datetime
     user: UserResponse
     images: List[ImageResponse] = []

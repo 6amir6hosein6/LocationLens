@@ -410,6 +410,25 @@ async def get_pending_locations(
     return [AdminLocationPending.model_validate(loc) for loc in locations]
 
 
+@router.get("/admin/all", response_model=list[AdminLocationPending])
+async def get_all_locations_admin(
+    status: Optional[str] = None,
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_admin_user),
+):
+    """Admin: list all locations (any status) optionally filtered by status."""
+    query = (
+        select(Location)
+        .options(selectinload(Location.user), selectinload(Location.images))
+        .order_by(Location.created_at.desc())
+    )
+    if status:
+        query = query.where(Location.status == status)
+    result = await db.execute(query)
+    locations = result.scalars().all()
+    return [AdminLocationPending.model_validate(loc) for loc in locations]
+
+
 @router.put("/admin/{location_id}/review")
 async def review_location(
     location_id: int,

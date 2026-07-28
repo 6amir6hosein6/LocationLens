@@ -3,15 +3,22 @@ import { MapContainer, TileLayer, Marker } from 'react-leaflet';
 import api from '../services/api';
 import { fa, faDate, faDateTime } from '../utils/persianNum';
 
+const STATUS_STYLES = {
+  pending: { bg: 'bg-yellow-50', border: 'border-yellow-200', text: 'text-yellow-700', label: 'در انتظار بررسی' },
+  approved: { bg: 'bg-green-50', border: 'border-green-200', text: 'text-green-700', label: 'تایید شده' },
+  rejected: { bg: 'bg-red-50', border: 'border-red-200', text: 'text-red-700', label: 'رد شده' },
+};
+
 export default function Admin() {
   const [isLogin, setIsLogin] = useState(true);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [pending, setPending] = useState([]);
+  const [allLocations, setAllLocations] = useState([]);
+  const [tab, setTab] = useState('pending');
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [selectedLocation, setSelectedLocation] = useState(null);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -32,11 +39,13 @@ export default function Admin() {
 
   const loadAdminData = async () => {
     try {
-      const [pendingRes, statsRes] = await Promise.all([
+      const [pendingRes, allRes, statsRes] = await Promise.all([
         api.get('/locations/admin/pending'),
+        api.get('/locations/admin/all'),
         api.get('/locations/admin/stats'),
       ]);
       setPending(pendingRes.data);
+      setAllLocations(allRes.data);
       setStats(statsRes.data);
     } catch (err) {
       if (err.response?.status === 403) {
@@ -60,7 +69,11 @@ export default function Admin() {
         rejection_reason: reason || null,
       });
       setPending((prev) => prev.filter((loc) => loc.id !== locationId));
-      setSelectedLocation(null);
+      setAllLocations((prev) =>
+        prev.map((loc) =>
+          loc.id === locationId ? { ...loc, status } : loc
+        )
+      );
       setStats((prev) => ({
         ...prev,
         pending: prev.pending - 1,
@@ -76,10 +89,10 @@ export default function Admin() {
     try {
       await api.delete(`/locations/admin/${locationId}`);
       setPending((prev) => prev.filter((loc) => loc.id !== locationId));
-      setSelectedLocation(null);
+      setAllLocations((prev) => prev.filter((loc) => loc.id !== locationId));
       setStats((prev) => ({
         ...prev,
-        pending: prev.pending - 1,
+        pending: prev.pending,
       }));
     } catch (err) {
       setError(err.response?.data?.detail || 'Failed to delete');
@@ -131,6 +144,8 @@ export default function Admin() {
     );
   }
 
+  const displayed = tab === 'pending' ? pending : allLocations;
+
   return (
     <div className="flex-1 bg-gray-50 overflow-y-auto">
       <div className="max-w-4xl mx-auto px-4 py-6">
@@ -162,101 +177,126 @@ export default function Admin() {
           <div className="bg-red-50 text-red-700 px-4 py-2 rounded-xl mb-4">{error}</div>
         )}
 
-        {/* Pending Locations */}
-        <h2 className="text-lg font-semibold mb-3">
-          در انتظار بررسی ({pending.length})
-        </h2>
+        {/* Tabs */}
+        <div className="flex gap-1 bg-gray-100 rounded-xl p-1 mb-5">
+          {[
+            { id: 'pending', label: 'در انتظار', count: pending.length },
+            { id: 'all', label: 'همه مکان‌ها', count: allLocations.length },
+          ].map((t) => (
+            <button
+              key={t.id}
+              onClick={() => setTab(t.id)}
+              className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${
+                tab === t.id
+                  ? 'bg-white text-gray-800 shadow-sm'
+                  : 'text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              {t.label}
+              <span className="mr-1 text-xs text-gray-400">({fa(t.count)})</span>
+            </button>
+          ))}
+        </div>
 
-        {pending.length === 0 ? (
+        {/* Locations list */}
+        {displayed.length === 0 ? (
           <div className="text-center py-12 text-gray-400">
             <p className="text-4xl mb-2">✅</p>
-            <p>مکانی در انتظار بررسی نیست</p>
+            <p>مکانی در این بخش وجود ندارد</p>
           </div>
         ) : (
           <div className="space-y-4">
-            {pending.map((loc) => (
-              <div key={loc.id} className="bg-white rounded-xl shadow-sm overflow-hidden">
-                <div className="md:flex">
-                  {loc.images && loc.images.length > 0 && (
-                    <div className="md:w-64 h-48 md:h-auto">
-                      <img
-                        src={`https://lens.amirhossein-service.ir/uploads/${loc.images[0].filename}`}
-                        alt={loc.title}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                  )}
-                  <div className="flex-1 p-4">
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <h3 className="font-semibold text-lg">{loc.title}</h3>
-                        <p className="text-sm text-gray-500">
-                          توسط {loc.user.name || `عکاس #${loc.user.id}`}
-                        </p>
-                        <p className="text-xs text-gray-400 mt-1">
-                          {faDateTime(loc.created_at)}
-                        </p>
+            {displayed.map((loc) => {
+              const style = STATUS_STYLES[loc.status] || STATUS_STYLES.pending;
+              return (
+                <div key={loc.id} className="bg-white rounded-xl shadow-sm overflow-hidden">
+                  <div className="md:flex">
+                    {loc.images && loc.images.length > 0 && (
+                      <div className="md:w-64 h-48 md:h-auto">
+                        <img
+                          src={`https://lens.amirhossein-service.ir/uploads/${loc.images[0].filename}`}
+                          alt={loc.title}
+                          className="w-full h-full object-cover"
+                        />
                       </div>
-                    </div>
-                    {(loc.province || loc.city || loc.neighborhood) && (
-                      <p className="text-sm text-gray-600 mt-2">
-                        📍 {[loc.neighborhood, loc.city, loc.province].filter(Boolean).join(', ')}
-                      </p>
                     )}
-                    {loc.address && (
-                      <p className="text-xs text-gray-500 mt-1">🏠 {loc.address}</p>
-                    )}
-                    {loc.description && (
-                      <p className="text-sm text-gray-500 mt-1">{loc.description}</p>
-                    )}
+                    <div className="flex-1 p-4">
+                      <div className="flex items-start justify-between">
+                        <div>
+                          <h3 className="font-semibold text-lg">{loc.title}</h3>
+                          <p className="text-sm text-gray-500">
+                            توسط {loc.user.name || `عکاس #${loc.user.id}`}
+                          </p>
+                          <p className="text-xs text-gray-400 mt-1">
+                            {faDateTime(loc.created_at)}
+                          </p>
+                        </div>
+                        <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${style.bg} ${style.text}`}>
+                          {style.label}
+                        </span>
+                      </div>
+                      {(loc.province || loc.city || loc.neighborhood) && (
+                        <p className="text-sm text-gray-600 mt-2">
+                          📍 {[loc.neighborhood, loc.city, loc.province].filter(Boolean).join(', ')}
+                        </p>
+                      )}
+                      {loc.address && (
+                        <p className="text-xs text-gray-500 mt-1">🏠 {loc.address}</p>
+                      )}
+                      {loc.description && (
+                        <p className="text-sm text-gray-500 mt-1">{loc.description}</p>
+                      )}
 
-                    {/* EXIF info */}
-                    {loc.images?.[0]?.camera_model && (
-                      <p className="text-xs text-gray-400 mt-2">
-                        📷 {loc.images[0].camera_make} {loc.images[0].camera_model}
-                      </p>
-                    )}
+                      {/* EXIF info */}
+                      {loc.images?.[0]?.camera_model && (
+                        <p className="text-xs text-gray-400 mt-2">
+                          📷 {loc.images[0].camera_make} {loc.images[0].camera_model}
+                        </p>
+                      )}
 
-                    {/* Mini map */}
-                    <div className="h-32 mt-3 rounded-lg overflow-hidden border">
-                      <MapContainer
-                        center={[loc.latitude, loc.longitude]}
-                        zoom={13}
-                        className="w-full h-full"
-                        zoomControl={false}
-                        scrollWheelZoom={false}
-                        dragging={false}
-                      >
-                        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-                        <Marker position={[loc.latitude, loc.longitude]} />
-                      </MapContainer>
-                    </div>
+                      {/* Mini map */}
+                      <div className="h-32 mt-3 rounded-lg overflow-hidden border">
+                        <MapContainer
+                          center={[loc.latitude, loc.longitude]}
+                          zoom={13}
+                          className="w-full h-full"
+                          zoomControl={false}
+                          scrollWheelZoom={false}
+                          dragging={false}
+                        >
+                          <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                          <Marker position={[loc.latitude, loc.longitude]} />
+                        </MapContainer>
+                      </div>
 
-                    {/* Action buttons */}
-                    <div className="flex gap-2 mt-4">
+                      {/* Action buttons */}
+                      {loc.status === 'pending' && (
+                        <div className="flex gap-2 mt-4">
+                          <button
+                            onClick={() => handleReview(loc.id, 'approved')}
+                            className="flex-1 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium"
+                          >
+                            تایید (+۲ سکه)
+                          </button>
+                          <button
+                            onClick={() => handleReview(loc.id, 'rejected', 'Does not meet guidelines')}
+                            className="flex-1 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm font-medium"
+                          >
+                            رد کردن
+                          </button>
+                        </div>
+                      )}
                       <button
-                        onClick={() => handleReview(loc.id, 'approved')}
-                        className="flex-1 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium"
+                        onClick={() => handleDelete(loc.id)}
+                        className="w-full mt-2 py-1.5 bg-gray-200 text-gray-600 rounded-lg hover:bg-gray-300 transition-colors text-xs font-medium"
                       >
-                        تایید (+۲ سکه)
-                      </button>
-                      <button
-                        onClick={() => handleReview(loc.id, 'rejected', 'Does not meet guidelines')}
-                        className="flex-1 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm font-medium"
-                      >
-                        رد کردن
+                        🗑️ حذف مکان
                       </button>
                     </div>
-                    <button
-                      onClick={() => handleDelete(loc.id)}
-                      className="w-full mt-2 py-1.5 bg-gray-200 text-gray-600 rounded-lg hover:bg-gray-300 transition-colors text-xs font-medium"
-                    >
-                      🗑️ حذف مکان
-                    </button>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>
