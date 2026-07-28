@@ -175,6 +175,11 @@ class PushTokenRequest(BaseModel):
     platform: str = "android"
 
 
+class PushBroadcastRequest(BaseModel):
+    title: str
+    message: str
+
+
 # Admin schemas
 class AdminLoginRequest(BaseModel):
     username: str

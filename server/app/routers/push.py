@@ -1,13 +1,14 @@
 from datetime import datetime
 
 from fastapi import APIRouter, Depends
-from sqlalchemy import select
+from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
-from app.dependencies import get_current_user
+from app.dependencies import get_current_user, get_admin_user
 from app.models import PushToken, User
-from app.schemas import PushTokenRequest
+from app.push import send_push_to_all
+from app.schemas import PushBroadcastRequest, PushTokenRequest
 
 router = APIRouter(prefix="/api/push", tags=["push"])
 
@@ -46,3 +47,23 @@ async def unregister_push_token(
     if existing:
         await db.delete(existing)
         await db.commit()
+
+
+@router.post("/broadcast")
+async def broadcast_push(
+    req: PushBroadcastRequest,
+    db: AsyncSession = Depends(get_db),
+    admin: User = Depends(get_admin_user),
+):
+    """Admin-only: send a custom notification to every registered device."""
+    count_result = await db.execute(select(func.count()).select_from(PushToken))
+    token_count = count_result.scalar_one()
+
+    await send_push_to_all(
+        db,
+        title=req.title,
+        body=req.message,
+        data={"type": "broadcast"},
+    )
+
+    return {"tokens_targeted": token_count}

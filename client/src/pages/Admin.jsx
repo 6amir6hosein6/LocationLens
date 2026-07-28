@@ -22,6 +22,11 @@ export default function Admin() {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [showNotifyModal, setShowNotifyModal] = useState(false);
+  const [notifyTitle, setNotifyTitle] = useState('');
+  const [notifyMessage, setNotifyMessage] = useState('');
+  const [notifySending, setNotifySending] = useState(false);
+  const [notifyFeedback, setNotifyFeedback] = useState('');
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -102,6 +107,29 @@ export default function Admin() {
     }
   };
 
+  const handleSendNotification = async (e) => {
+    e.preventDefault();
+    setNotifySending(true);
+    setNotifyFeedback('');
+    try {
+      const res = await api.post('/push/broadcast', {
+        title: notifyTitle,
+        message: notifyMessage,
+      });
+      setNotifyFeedback(`اعلان برای ${fa(res.data.tokens_targeted)} دستگاه ارسال شد`);
+      setNotifyTitle('');
+      setNotifyMessage('');
+      setTimeout(() => {
+        setShowNotifyModal(false);
+        setNotifyFeedback('');
+      }, 2000);
+    } catch (err) {
+      setNotifyFeedback(err.response?.data?.detail || 'ارسال اعلان ناموفق بود');
+    } finally {
+      setNotifySending(false);
+    }
+  };
+
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
@@ -175,6 +203,15 @@ export default function Admin() {
             </div>
           </div>
           <div className="flex items-center gap-2">
+            <button
+              onClick={() => setShowNotifyModal(true)}
+              className="px-3 py-1.5 bg-purple-50 text-purple-600 rounded-lg text-xs font-medium hover:bg-purple-100 transition-colors flex items-center gap-1"
+            >
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+              </svg>
+              ارسال اعلان
+            </button>
             <button
               onClick={loadAdminData}
               className="px-3 py-1.5 bg-blue-50 text-blue-600 rounded-lg text-xs font-medium hover:bg-blue-100 transition-colors flex items-center gap-1"
@@ -394,6 +431,53 @@ export default function Admin() {
           </div>
         )}
       </div>
+
+      {showNotifyModal && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 px-4">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm p-5">
+            <h3 className="text-lg font-semibold mb-4">ارسال اعلان به همه کاربران</h3>
+            <form onSubmit={handleSendNotification}>
+              <label className="block text-sm font-medium text-gray-700 mb-1">عنوان</label>
+              <input
+                type="text"
+                value={notifyTitle}
+                onChange={(e) => setNotifyTitle(e.target.value)}
+                required
+                placeholder="مکان جدید اضافه شد"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none mb-3"
+              />
+              <label className="block text-sm font-medium text-gray-700 mb-1">متن پیام</label>
+              <textarea
+                value={notifyMessage}
+                onChange={(e) => setNotifyMessage(e.target.value)}
+                required
+                rows={3}
+                placeholder="یک مکان جدید برای عکاسی اضافه شد، حتما ببین!"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none mb-3 resize-none"
+              />
+              {notifyFeedback && (
+                <p className="text-sm text-center mb-3 text-gray-600">{notifyFeedback}</p>
+              )}
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => { setShowNotifyModal(false); setNotifyFeedback(''); }}
+                  className="flex-1 py-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors text-sm font-medium"
+                >
+                  انصراف
+                </button>
+                <button
+                  type="submit"
+                  disabled={notifySending}
+                  className="flex-1 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm font-medium disabled:opacity-50"
+                >
+                  {notifySending ? 'در حال ارسال...' : 'ارسال'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
