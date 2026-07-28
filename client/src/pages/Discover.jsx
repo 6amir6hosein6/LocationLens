@@ -29,6 +29,8 @@ export default function DashboardPage() {
       await api.delete(`/locations/mine/${locationId}`);
       setSubmissions((prev) => prev.filter((loc) => loc.id !== locationId));
     } catch (err) {
+      const msg = err.response?.data?.detail || 'خطا در حذف مکان';
+      alert(msg);
       console.error('خطا در حذف:', err);
     }
   };

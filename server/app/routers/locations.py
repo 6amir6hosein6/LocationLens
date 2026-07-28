@@ -3,7 +3,7 @@ import uuid
 from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form, status
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, func, case
+from sqlalchemy import select, func, case, delete
 from sqlalchemy.orm import selectinload
 from typing import Optional
 from PIL import Image as PILImage
@@ -755,6 +755,11 @@ async def admin_delete_location(
         except OSError:
             pass
 
+    # Clean up related revealed-location rows to avoid FK constraint errors
+    await db.execute(
+        delete(RevealedLocation).where(RevealedLocation.location_id == location_id)
+    )
+
     await db.delete(loc)
     await db.commit()
     return {"message": "Location deleted"}
@@ -785,6 +790,11 @@ async def user_delete_own_location(
             os.remove(os.path.join(upload_dir, img.filename))
         except OSError:
             pass
+
+    # Clean up related revealed-location rows to avoid FK constraint errors
+    await db.execute(
+        delete(RevealedLocation).where(RevealedLocation.location_id == location_id)
+    )
 
     await db.delete(loc)
     await db.commit()
