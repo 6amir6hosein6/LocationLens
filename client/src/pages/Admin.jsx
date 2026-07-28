@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { MapContainer, TileLayer, Marker } from 'react-leaflet';
 import api from '../services/api';
 import { fa, faDate, faDateTime } from '../utils/persianNum';
@@ -10,12 +11,14 @@ const STATUS_STYLES = {
 };
 
 export default function Admin() {
+  const navigate = useNavigate();
   const [isLogin, setIsLogin] = useState(true);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [pending, setPending] = useState([]);
   const [allLocations, setAllLocations] = useState([]);
   const [tab, setTab] = useState('pending');
+  const [statusFilter, setStatusFilter] = useState('all');
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -99,14 +102,27 @@ export default function Admin() {
     }
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    window.location.reload();
+  };
+
+  // ---- computed display list ----
+  const baseList = tab === 'pending' ? pending : allLocations;
+  const displayed =
+    tab === 'all' && statusFilter !== 'all'
+      ? baseList.filter((loc) => loc.status === statusFilter)
+      : baseList;
+
   if (isLogin) {
     return (
       <div className="flex-1 flex items-center justify-center bg-gray-50 px-4">
         <div className="max-w-sm w-full">
           <div className="text-center mb-6">
             <img src="/icons/logo.svg" alt="لوکیشن‌لنز" className="w-12 h-12 mx-auto mb-2" />
-          <h1 className="text-2xl font-bold text-gray-800">پنل مدیریت</h1>
-          <p className="text-gray-500 text-sm mt-1">مدیریت لوکیشن‌لنز</p>
+            <h1 className="text-2xl font-bold text-gray-800">پنل مدیریت</h1>
+            <p className="text-gray-500 text-sm mt-1">مدیریت لوکیشن‌لنز</p>
           </div>
           <form onSubmit={handleLogin} className="bg-white rounded-xl shadow-sm p-6 space-y-4">
             <div>
@@ -144,25 +160,74 @@ export default function Admin() {
     );
   }
 
-  const displayed = tab === 'pending' ? pending : allLocations;
-
   return (
     <div className="flex-1 bg-gray-50 overflow-y-auto">
-      <div className="max-w-4xl mx-auto px-4 py-6">
-        <h1 className="text-2xl font-bold mb-6">داشبورد مدیریت</h1>
+      {/* Top Admin Navigation Bar */}
+      <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
+        <div className="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-lg bg-gray-800 text-white flex items-center justify-center font-bold text-sm">
+              A
+            </div>
+            <div>
+              <h1 className="text-base font-bold text-gray-800 leading-tight">پنل مدیریت</h1>
+              <p className="text-[11px] text-gray-400 leading-tight">LocationLens Admin</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={loadAdminData}
+              className="px-3 py-1.5 bg-blue-50 text-blue-600 rounded-lg text-xs font-medium hover:bg-blue-100 transition-colors flex items-center gap-1"
+            >
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+              به‌روزرسانی
+            </button>
+            <button
+              onClick={() => navigate('/')}
+              className="px-3 py-1.5 bg-gray-100 text-gray-600 rounded-lg text-xs font-medium hover:bg-gray-200 transition-colors flex items-center gap-1"
+            >
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+              </svg>
+              بازگشت به اپ
+            </button>
+            <button
+              onClick={handleLogout}
+              className="px-3 py-1.5 bg-red-50 text-red-600 rounded-lg text-xs font-medium hover:bg-red-100 transition-colors flex items-center gap-1"
+            >
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+              </svg>
+              خروج
+            </button>
+          </div>
+        </div>
+      </div>
 
+      <div className="max-w-4xl mx-auto px-4 py-6">
         {/* Stats */}
         {stats && (
           <div className="grid grid-cols-4 gap-3 mb-6">
-            <div className="bg-yellow-50 rounded-xl p-4 text-center border border-yellow-200">
+            <div
+              className="bg-yellow-50 rounded-xl p-4 text-center border border-yellow-200 cursor-pointer hover:shadow-md transition-shadow"
+              onClick={() => { setTab('all'); setStatusFilter('pending'); }}
+            >
               <p className="text-3xl font-bold text-yellow-600">{stats.pending}</p>
               <p className="text-sm text-yellow-700 mt-1">در انتظار</p>
             </div>
-            <div className="bg-green-50 rounded-xl p-4 text-center border border-green-200">
+            <div
+              className="bg-green-50 rounded-xl p-4 text-center border border-green-200 cursor-pointer hover:shadow-md transition-shadow"
+              onClick={() => { setTab('all'); setStatusFilter('approved'); }}
+            >
               <p className="text-3xl font-bold text-green-600">{stats.approved}</p>
               <p className="text-sm text-green-700 mt-1">تایید شده</p>
             </div>
-            <div className="bg-red-50 rounded-xl p-4 text-center border border-red-200">
+            <div
+              className="bg-red-50 rounded-xl p-4 text-center border border-red-200 cursor-pointer hover:shadow-md transition-shadow"
+              onClick={() => { setTab('all'); setStatusFilter('rejected'); }}
+            >
               <p className="text-3xl font-bold text-red-600">{stats.rejected}</p>
               <p className="text-sm text-red-700 mt-1">رد شده</p>
             </div>
@@ -177,10 +242,10 @@ export default function Admin() {
           <div className="bg-red-50 text-red-700 px-4 py-2 rounded-xl mb-4">{error}</div>
         )}
 
-        {/* Tabs */}
-        <div className="flex gap-1 bg-gray-100 rounded-xl p-1 mb-5">
+        {/* Main Tabs */}
+        <div className="flex gap-1 bg-gray-100 rounded-xl p-1 mb-4">
           {[
-            { id: 'pending', label: 'در انتظار', count: pending.length },
+            { id: 'pending', label: 'در انتظار بررسی', count: pending.length },
             { id: 'all', label: 'همه مکان‌ها', count: allLocations.length },
           ].map((t) => (
             <button
@@ -197,6 +262,35 @@ export default function Admin() {
             </button>
           ))}
         </div>
+
+        {/* Status quick-filter chips (shown only on "all" tab) */}
+        {tab === 'all' && (
+          <div className="flex flex-wrap gap-2 mb-5">
+            {[
+              { id: 'all', label: 'همه', color: 'bg-gray-800 text-white' },
+              { id: 'pending', label: 'در انتظار', color: 'bg-yellow-100 text-yellow-700 border border-yellow-200' },
+              { id: 'approved', label: 'تایید شده', color: 'bg-green-100 text-green-700 border border-green-200' },
+              { id: 'rejected', label: 'رد شده', color: 'bg-red-100 text-red-700 border border-red-200' },
+            ].map((chip) => (
+              <button
+                key={chip.id}
+                onClick={() => setStatusFilter(chip.id)}
+                className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
+                  statusFilter === chip.id
+                    ? chip.color
+                    : 'bg-white text-gray-500 border border-gray-200 hover:bg-gray-50'
+                }`}
+              >
+                {chip.label}
+                {chip.id !== 'all' && (
+                  <span className="mr-1 opacity-70">
+                    ({fa(allLocations.filter((l) => l.status === chip.id).length)})
+                  </span>
+                )}
+              </button>
+            ))}
+          </div>
+        )}
 
         {/* Locations list */}
         {displayed.length === 0 ? (
