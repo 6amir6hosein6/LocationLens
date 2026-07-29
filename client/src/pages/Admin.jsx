@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { MapContainer, TileLayer, Marker } from 'react-leaflet';
 import api from '../services/api';
 import { fa, faDate, faDateTime } from '../utils/persianNum';
+import { useAppReady } from '../contexts/AppReadyContext';
 
 const STATUS_STYLES = {
   pending: { bg: 'bg-yellow-50', border: 'border-yellow-200', text: 'text-yellow-700', label: 'در انتظار بررسی' },
@@ -27,6 +28,11 @@ export default function Admin() {
   const [notifyMessage, setNotifyMessage] = useState('');
   const [notifySending, setNotifySending] = useState(false);
   const [notifyFeedback, setNotifyFeedback] = useState('');
+  const { markReady } = useAppReady();
+
+  useEffect(() => {
+    markReady();
+  }, [markReady]);
 
   const handleLogin = async (e) => {
     e.preventDefault();

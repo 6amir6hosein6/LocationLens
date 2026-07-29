@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { useAppReady } from '../contexts/AppReadyContext';
 import { fa, faNum, toEnglishDigits } from '../utils/persianNum';
 import { isValidIranianPhone } from '../utils/validation';
 
@@ -12,7 +13,12 @@ export default function Register() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const { sendCode, verifyCode } = useAuth();
+  const { markReady } = useAppReady();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    markReady();
+  }, [markReady]);
 
   const handleSendCode = async (e) => {
     e.preventDefault();
