@@ -167,9 +167,9 @@ export default function Admin() {
       <div className="flex-1 flex items-center justify-center bg-gray-50 px-4">
         <div className="max-w-sm w-full">
           <div className="text-center mb-6">
-            <img src="/icons/logo.svg" alt="لوکیشن‌لنز" className="w-12 h-12 mx-auto mb-2" />
+            <img src="/icons/logo.svg" alt="لوک‌لنز" className="w-12 h-12 mx-auto mb-2" />
             <h1 className="text-2xl font-bold text-gray-800">پنل مدیریت</h1>
-            <p className="text-gray-500 text-sm mt-1">مدیریت لوکیشن‌لنز</p>
+            <p className="text-gray-500 text-sm mt-1">مدیریت لوک‌لنز</p>
           </div>
           <form onSubmit={handleLogin} className="bg-white rounded-xl shadow-sm p-6 space-y-4">
             <div>

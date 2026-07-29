@@ -23,8 +23,6 @@ export default function AddLocation() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
-  const [gettingLocation, setGettingLocation] = useState(false);
-  const [gpsError, setGpsError] = useState('');
   const fileInputRef = useRef(null);
   const imgRef = useRef(null);
 
@@ -35,37 +33,6 @@ export default function AddLocation() {
       setCity('');
     }
   }, [province]);
-
-  const getMyLocation = () => {
-    if (!navigator.geolocation) {
-      setError('موقعیت‌یاب توسط مرورگر شما پشتیبانی نمی‌شود');
-      return;
-    }
-    setGettingLocation(true);
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        setLatitude(pos.coords.latitude.toFixed(6));
-        setLongitude(pos.coords.longitude.toFixed(6));
-        setGettingLocation(false);
-        setGpsError('');
-        reverseGeocode(pos.coords.latitude, pos.coords.longitude);
-      },
-      () => {
-        if (!latitude && !longitude) {
-          setGpsError('دریافت GPS امکان‌پذیر نبود. روی نقشه پین بگذارید.');
-        }
-        setGettingLocation(false);
-      }
-    );
-  };
-
-  const reverseGeocode = async (lat, lon) => {
-    try {
-      const res = await api.get('/search/reverse', { params: { lat, lon } });
-      const data = res.data;
-      if (data.display_name) setAddress(data.display_name);
-    } catch (e) {}
-  };
 
   const MAX_FILE_SIZE_MB = 10; // Must match backend MAX_UPLOAD_SIZE_MB
 
@@ -308,7 +275,6 @@ export default function AddLocation() {
                 setLatitude(''); setLongitude('');
                 setProvince(''); setCity(''); setNeighborhood('');
                 setFile(null); setPreview(null); setExifData({});
-                setGpsError('');
               }}
               className="flex-1 py-2.5 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors font-medium"
             >
@@ -337,26 +303,14 @@ export default function AddLocation() {
 
           {/* ── MAP PICKER ── */}
           <div className="bg-white rounded-xl p-4 shadow-sm">
-            <div className="flex items-center justify-between mb-3">
-              <label className="text-sm font-medium text-gray-700">
-                انتخاب مکان <span className="text-red-500">*</span>
-              </label>
-              <button
-                type="button"
-                onClick={getMyLocation}
-                className="text-xs text-blue-600 hover:text-blue-700 flex items-center gap-1"
-              >
-                {gettingLocation ? 'در حال دریافت...' : '📍 استفاده از GPS من'}
-              </button>
-            </div>
+            <label className="block text-sm font-medium text-gray-700 mb-3">
+              انتخاب مکان <span className="text-red-500">*</span>
+            </label>
             <MapPicker
               latitude={latitude}
               longitude={longitude}
-              onPick={(lat, lng) => { setLatitude(lat); setLongitude(lng); setGpsError(''); }}
+              onPick={(lat, lng) => { setLatitude(lat); setLongitude(lng); }}
             />
-            {gpsError && !latitude && (
-              <p className="text-xs text-amber-600 bg-amber-50 px-3 py-1.5 rounded-lg mt-2">{gpsError}</p>
-            )}
             {exifData.latitude != null && exifData.longitude != null && (
               <p className="text-xs text-green-600 mt-1.5 flex items-center gap-1">
                 <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>

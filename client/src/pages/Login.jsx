@@ -55,8 +55,8 @@ export default function Login() {
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center px-4">
       <div className="max-w-md w-full mx-auto">
         <div className="text-center mb-8">
-          <img src="/icons/logo.svg" alt="لوکیشن‌لنز" className="w-16 h-16 mx-auto mb-3" />
-          <h1 className="text-3xl font-bold text-blue-600">لوکیشن‌لنز</h1>
+          <img src="/icons/logo.svg" alt="لوک‌لنز" className="w-16 h-16 mx-auto mb-3" />
+          <h1 className="text-3xl font-bold text-blue-600">لوک‌لنز</h1>
           <p className="text-gray-500 mt-2">مکان‌های عکاسی پرتره زیبا را کشف و به اشتراک بگذار</p>
         </div>
 

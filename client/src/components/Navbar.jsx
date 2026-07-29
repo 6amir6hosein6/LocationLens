@@ -19,7 +19,7 @@ export default function Navbar() {
     <nav className="bg-white border-b border-gray-200 px-4 py-2 flex items-center justify-between z-50 relative">
       <Link to="/" className="flex items-center gap-1.5 text-lg font-bold text-blue-600">
         <img src="/icons/logo.svg" alt="" className="w-6 h-6" />
-        لوکیشن‌لنز
+        لوک‌لنز
       </Link>
 
       <div className="flex items-center gap-1">

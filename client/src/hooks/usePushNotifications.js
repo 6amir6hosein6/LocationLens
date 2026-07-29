@@ -44,7 +44,7 @@ export default function usePushNotifications() {
             notifications: [
               {
                 id: Math.floor(Date.now() % 2147483647),
-                title: notification.title || 'لوکیشن‌لنز',
+                title: notification.title || 'لوک‌لنز',
                 body: notification.body || '',
                 smallIcon: 'ic_stat_notify',
                 iconColor: '#2563eb',
