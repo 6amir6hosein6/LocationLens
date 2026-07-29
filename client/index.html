@@ -65,7 +65,25 @@
     <script>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js').catch(() => {});
+          // Pass the (public, non-secret) Firebase web config to the service worker via
+          // query params, since a plain static file can't read Vite env vars directly.
+          // When a var is unset, Vite leaves the unresolved placeholder text in place
+          // rather than substituting an empty string, so filter those out explicitly -
+          // sw.js only sets up messaging if a real apiKey param is present.
+          const rawFirebaseConfig = {
+            apiKey: '%VITE_FIREBASE_API_KEY%',
+            authDomain: '%VITE_FIREBASE_AUTH_DOMAIN%',
+            projectId: '%VITE_FIREBASE_PROJECT_ID%',
+            storageBucket: '%VITE_FIREBASE_STORAGE_BUCKET%',
+            messagingSenderId: '%VITE_FIREBASE_MESSAGING_SENDER_ID%',
+            appId: '%VITE_FIREBASE_APP_ID%',
+          };
+          const swParams = new URLSearchParams(
+            Object.fromEntries(
+              Object.entries(rawFirebaseConfig).filter(([, v]) => v && !v.includes('%'))
+            )
+          );
+          navigator.serviceWorker.register(`/sw.js?${swParams}`).catch(() => {});
         });
       }
     </script>

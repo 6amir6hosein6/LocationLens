@@ -1,3 +1,34 @@
+// Web push (Firebase Cloud Messaging) for background/closed-tab notifications.
+// Config comes via the registration URL's query string (see index.html) since a plain
+// static file can't read Vite env vars - stays inert if unconfigured.
+const swQuery = new URLSearchParams(self.location.search);
+const firebaseApiKey = swQuery.get('apiKey');
+
+if (firebaseApiKey) {
+  importScripts('https://www.gstatic.com/firebasejs/12.16.0/firebase-app-compat.js');
+  importScripts('https://www.gstatic.com/firebasejs/12.16.0/firebase-messaging-compat.js');
+
+  firebase.initializeApp({
+    apiKey: firebaseApiKey,
+    authDomain: swQuery.get('authDomain'),
+    projectId: swQuery.get('projectId'),
+    storageBucket: swQuery.get('storageBucket'),
+    messagingSenderId: swQuery.get('messagingSenderId'),
+    appId: swQuery.get('appId'),
+  });
+
+  const messaging = firebase.messaging();
+
+  // Fires when a push arrives while no tab has focus - foreground delivery is handled
+  // separately in useWebPushNotifications.js via onMessage().
+  messaging.onBackgroundMessage((payload) => {
+    self.registration.showNotification(payload.notification?.title || 'لوک‌لنز', {
+      body: payload.notification?.body || '',
+      icon: '/icons/icon-192.png',
+    });
+  });
+}
+
 const CACHE_NAME = 'locationlens-v2';
 const STATIC_ASSETS = [
   '/',
