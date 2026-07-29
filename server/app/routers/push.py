@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from fastapi import APIRouter, Depends
-from sqlalchemy import select, func
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
@@ -56,14 +56,10 @@ async def broadcast_push(
     admin: User = Depends(get_admin_user),
 ):
     """Admin-only: send a custom notification to every registered device."""
-    count_result = await db.execute(select(func.count()).select_from(PushToken))
-    token_count = count_result.scalar_one()
-
-    await send_push_to_all(
+    result = await send_push_to_all(
         db,
         title=req.title,
         body=req.message,
         data={"type": "broadcast"},
     )
-
-    return {"tokens_targeted": token_count}
+    return {"tokens_targeted": result["tokens"], **result}

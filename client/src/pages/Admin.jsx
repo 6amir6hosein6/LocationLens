@@ -122,13 +122,26 @@ export default function Admin() {
         title: notifyTitle,
         message: notifyMessage,
       });
-      setNotifyFeedback(`اعلان برای ${fa(res.data.tokens_targeted)} دستگاه ارسال شد`);
-      setNotifyTitle('');
-      setNotifyMessage('');
-      setTimeout(() => {
-        setShowNotifyModal(false);
-        setNotifyFeedback('');
-      }, 2000);
+      const { configured, tokens, sent, failed, errors } = res.data;
+
+      if (!configured) {
+        setNotifyFeedback('فایربیس روی سرور تنظیم نشده (فایل کلید سرویس یافت نشد)');
+      } else if (tokens === 0) {
+        setNotifyFeedback('هیچ دستگاهی برای اعلان ثبت نشده - ابتدا با اپ اندروید وارد شوید');
+      } else {
+        let msg = `از ${fa(tokens)} دستگاه: ${fa(sent)} موفق، ${fa(failed)} ناموفق`;
+        if (errors?.length) msg += ` — خطا: ${errors[0]}`;
+        setNotifyFeedback(msg);
+      }
+
+      if (configured && tokens > 0 && failed === 0) {
+        setNotifyTitle('');
+        setNotifyMessage('');
+        setTimeout(() => {
+          setShowNotifyModal(false);
+          setNotifyFeedback('');
+        }, 2500);
+      }
     } catch (err) {
       setNotifyFeedback(err.response?.data?.detail || 'ارسال اعلان ناموفق بود');
     } finally {
