@@ -46,6 +46,8 @@ export default function usePushNotifications() {
                 id: Math.floor(Date.now() % 2147483647),
                 title: notification.title || 'لوکیشن‌لنز',
                 body: notification.body || '',
+                smallIcon: 'ic_stat_notify',
+                iconColor: '#2563eb',
               },
             ],
           }).catch(() => {});
