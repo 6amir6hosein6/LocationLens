@@ -2,6 +2,7 @@ from datetime import datetime
 
 from fastapi import APIRouter, Depends
 from sqlalchemy import select
+from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
@@ -19,17 +20,26 @@ async def register_push_token(
     db: AsyncSession = Depends(get_db),
     user: User = Depends(get_current_user),
 ):
-    """Register (or refresh) a device's FCM token for the current user."""
-    result = await db.execute(select(PushToken).where(PushToken.token == req.token))
-    existing = result.scalar_one_or_none()
+    """Register (or refresh) a device's FCM token for the current user.
 
-    if existing:
-        existing.user_id = user.id
-        existing.platform = req.platform
-        existing.last_seen_at = datetime.utcnow()
-    else:
-        db.add(PushToken(user_id=user.id, token=req.token, platform=req.platform))
-
+    Uses an atomic upsert (not check-then-insert) because the same token can arrive in
+    two near-simultaneous requests - Capacitor's 'registration' event has fired twice for
+    the same token in practice, and a check-then-insert race would crash the second one
+    with a unique constraint violation."""
+    stmt = pg_insert(PushToken).values(
+        user_id=user.id,
+        token=req.token,
+        platform=req.platform,
+    )
+    stmt = stmt.on_conflict_do_update(
+        index_elements=[PushToken.token],
+        set_={
+            "user_id": user.id,
+            "platform": req.platform,
+            "last_seen_at": datetime.utcnow(),
+        },
+    )
+    await db.execute(stmt)
     await db.commit()
 
 
