@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Capacitor } from '@capacitor/core';
 import { PushNotifications } from '@capacitor/push-notifications';
+import { LocalNotifications } from '@capacitor/local-notifications';
 import api from '../services/api';
 
 /**
@@ -32,6 +33,22 @@ export default function usePushNotifications() {
       listeners.push(
         await PushNotifications.addListener('registrationError', (err) => {
           console.error('Push registration failed', err);
+        })
+      );
+
+      // Android only auto-displays a system notification when the app is backgrounded
+      // or closed. When it's open, FCM delivers silently - show it ourselves.
+      listeners.push(
+        await PushNotifications.addListener('pushNotificationReceived', (notification) => {
+          LocalNotifications.schedule({
+            notifications: [
+              {
+                id: Math.floor(Date.now() % 2147483647),
+                title: notification.title || 'لوکیشن‌لنز',
+                body: notification.body || '',
+              },
+            ],
+          }).catch(() => {});
         })
       );
 
