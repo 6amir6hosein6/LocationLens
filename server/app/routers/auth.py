@@ -14,25 +14,33 @@ from app.schemas import (
 from app.auth import create_access_token
 from app.config import settings
 from app.dependencies import get_current_user
+from app import sms
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 
 
 @router.post("/send-code")
 async def send_code(req: PhoneRequest):
-    """Mock SMS send - always succeeds. In production, integrate with Twilio/etc."""
+    """Generate and send an SMS verification code (static code when SMS_DEV_MODE is on)."""
     phone = normalize_iranian_phone(req.phone)
     if phone is None:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Invalid Iranian mobile phone number"
         )
+    try:
+        sms.issue_otp(phone)
+    except RuntimeError:
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail="Failed to send verification code"
+        )
     return {"message": "Code sent successfully", "phone": phone}
 
 
 @router.post("/verify-code", response_model=TokenResponse)
 async def verify_code(req: VerifyCodeRequest, db: AsyncSession = Depends(get_db)):
-    """Verify SMS code. For now, only '123456' is accepted."""
+    """Verify the SMS code previously issued for this phone number."""
     phone = normalize_iranian_phone(req.phone)
     if phone is None:
         raise HTTPException(
@@ -41,7 +49,7 @@ async def verify_code(req: VerifyCodeRequest, db: AsyncSession = Depends(get_db)
         )
     req.phone = phone
 
-    if req.code != settings.MOCK_SMS_CODE:
+    if not sms.verify_otp(req.phone, req.code):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Invalid verification code"

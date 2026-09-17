@@ -25,8 +25,14 @@ class Settings(BaseSettings):
     ADMIN_PHONE: str = "admin_phone"
     ADMIN_INITIAL_COINS: int = 999999
 
-    # Mock SMS verification
+    # SMS verification
+    # When True, OTP codes are the static MOCK_SMS_CODE and no real SMS is sent (local/dev).
+    # When False, a random code is generated per request and sent via Kavenegar.
+    SMS_DEV_MODE: bool = True
     MOCK_SMS_CODE: str = "123456"
+    KAVENEGAR_API_KEY: str = ""
+    # Sender line to send the OTP text message from (e.g. the trial line from your Kavenegar panel).
+    KAVENEGAR_SENDER: str = ""
 
     # Coin economy
     SIGNUP_BONUS_COINS: int = 10

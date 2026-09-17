@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useAppReady } from '../contexts/AppReadyContext';
-import { fa, faNum, toEnglishDigits } from '../utils/persianNum';
+import { toEnglishDigits } from '../utils/persianNum';
 import { isValidIranianPhone } from '../utils/validation';
 
 export default function Login() {
@@ -123,10 +123,6 @@ export default function Login() {
             </form>
           )}
         </div>
-
-        <p className="text-center text-sm text-gray-500 mt-6">
-          دمو: هر شماره و کد <span className="font-mono font-bold">{faNum('123456')}</span> را وارد کنید
-        </p>
       </div>
     </div>
   );
