@@ -52,7 +52,7 @@ services:
         VITE_FIREBASE_VAPID_KEY: ${VITE_FIREBASE_VAPID_KEY:-}
     container_name: app-frontend
     ports:
-      - "80:80"
+      - "1378:80"
     depends_on:
       - backend
     restart: unless-stopped
